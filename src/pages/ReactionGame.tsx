@@ -74,8 +74,10 @@ const ReactionGame = () => {
       localStorage.setItem("reactionHistory", JSON.stringify(newHistory));
       
       const timeInSeconds = (time / 1000).toFixed(2);
-      if (time <= 150) {
+      if (time <= 300) {
         setResultMessage(`${timeInSeconds}초 - 리워드를 받을 수 있어요! 🎁`);
+        // 오늘 리워드 받음 표시
+        localStorage.setItem("reactionRewardDate", new Date().toDateString());
       } else {
         setResultMessage(`반응속도: ${timeInSeconds}초 🎯`);
       }
@@ -153,7 +155,7 @@ const ReactionGame = () => {
               토끼가 여우로 바뀔 때 터치하세요!
             </p>
             <p className="text-lg text-primary font-semibold">
-              ⚡ 0.15초 보다 빠르면 리워드 적립!
+              ⚡ 0.3초 보다 빠르면 리워드 적립!
             </p>
           </div>
           <div className="relative">
@@ -203,7 +205,7 @@ const ReactionGame = () => {
             >
               🎬 광고 보고 다시하기
             </Button>
-            {reactionTime !== null && reactionTime <= 150 && (
+            {reactionTime !== null && reactionTime <= 300 && (
               <Button
                 onClick={handleRewardClick}
                 variant="secondary"
@@ -224,13 +226,13 @@ const ReactionGame = () => {
             {reactionTime !== null && (
               <>
                 <p className="text-center text-muted-foreground text-sm">
-                  {reactionTime <= 150
+                  {reactionTime <= 300
                     ? "🏆 최고의 반응속도! 리워드 획득!"
-                    : reactionTime < 200
-                    ? "조금만 더 빨리! (리워드는 0.15초 이하)"
-                    : reactionTime < 300
-                    ? "훌륭해요! 👏"
+                    : reactionTime < 400
+                    ? "조금만 더 빨리! (리워드는 0.3초 이하)"
                     : reactionTime < 500
+                    ? "훌륭해요! 👏"
+                    : reactionTime < 700
                     ? "잘했어요! 😊"
                     : "다음엔 더 빠르게! 💪"}
                 </p>

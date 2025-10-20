@@ -74,10 +74,15 @@ const GemGame = () => {
           // 데이터베이스에 저장
           supabase
             .from('gem_game_results')
-            .insert({ clicks, success })
-            .then(({ error }) => {
-              if (error) console.error('Failed to save result:', error);
-            });
+        .insert({ clicks, success })
+        .then(({ error }) => {
+          if (error) console.error('Failed to save result:', error);
+        });
+
+      // 성공시 오늘 리워드 받음 표시
+      if (success) {
+        localStorage.setItem("gemRewardDate", new Date().toDateString());
+      }
           
           // 로컬 히스토리에도 저장
           const newHistory = [...clickHistory, clicks];

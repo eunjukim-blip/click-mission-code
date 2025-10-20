@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { toast } from "sonner";
 
 
 type Zodiac = "쥐" | "소" | "호랑이" | "토끼" | "용" | "뱀" | "말" | "양" | "원숭이" | "닭" | "개" | "돼지";
@@ -382,8 +383,25 @@ const FortuneGame = () => {
                 >
                   다시 보기
                 </Button>
+                <Button
+                  onClick={() => {
+                    // 오늘 리워드 받음 표시
+                    localStorage.setItem("fortuneRewardDate", new Date().toDateString());
+                    toast.success("축하합니다! 🎁", {
+                      description: "운세 리워드가 지급되었습니다!",
+                      duration: 3000,
+                    });
+                    setTimeout(() => navigate("/"), 1000);
+                  }}
+                  variant="secondary"
+                  className="w-full text-base" 
+                  size="lg"
+                >
+                  🎁 리워드 받기
+                </Button>
                 <Button 
                   onClick={() => navigate("/")} 
+                  variant="outline"
                   className="w-full text-base" 
                   size="lg"
                 >

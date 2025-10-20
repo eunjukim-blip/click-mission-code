@@ -1,14 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import missionBanner from "@/assets/mission-center-banner.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
   const [avgReactionTime, setAvgReactionTime] = useState<number | null>(null);
   const [avgClicks, setAvgClicks] = useState<number | null>(null);
+  const [reactionCompleted, setReactionCompleted] = useState(false);
+  const [gemCompleted, setGemCompleted] = useState(false);
+  const [fortuneCompleted, setFortuneCompleted] = useState(false);
 
   useEffect(() => {
     // 반응속도 평균 가져오기
@@ -32,7 +37,20 @@ const Index = () => {
           setAvgClicks(sum / data.length);
         }
       });
+
+    // 오늘 완료 여부 확인
+    const today = new Date().toDateString();
+    setReactionCompleted(localStorage.getItem("reactionRewardDate") === today);
+    setGemCompleted(localStorage.getItem("gemRewardDate") === today);
+    setFortuneCompleted(localStorage.getItem("fortuneRewardDate") === today);
   }, []);
+
+  const handleCompletedClick = (gameName: string) => {
+    toast.info("오늘은 플레이가 끝났어요", {
+      description: `${gameName}는 내일 다시 플레이할 수 있습니다.`,
+      duration: 3000,
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
@@ -51,9 +69,14 @@ const Index = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full animate-in fade-in duration-700">
         <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
-          onClick={() => navigate("/reaction")}
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
+          onClick={() => reactionCompleted ? handleCompletedClick("캐릭터 반응 게임") : navigate("/reaction")}
         >
+          {reactionCompleted && (
+            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
+              적립완료
+            </Badge>
+          )}
           <CardHeader>
             <div className="text-6xl mb-4 text-center">🎨</div>
             <CardTitle className="text-2xl text-center">캐릭터 반응 게임</CardTitle>
@@ -61,7 +84,7 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>⚡ 반응속도가 0.15초 보다 빠르면 리워드 적립!</p>
+              <p>⚡ 반응속도가 0.3초 보다 빠르면 리워드 적립!</p>
               <p>🎯 반응속도 측정</p>
               {avgReactionTime && (
                 <p className="text-primary font-semibold pt-2 border-t">
@@ -69,16 +92,21 @@ const Index = () => {
                 </p>
               )}
             </div>
-            <Button className="w-full mt-4" size="lg">
-              플레이하기 →
+            <Button className="w-full mt-4" size="lg" disabled={reactionCompleted}>
+              {reactionCompleted ? "오늘 완료 ✓" : "플레이하기 →"}
             </Button>
           </CardContent>
         </Card>
 
         <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
-          onClick={() => navigate("/gem")}
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
+          onClick={() => gemCompleted ? handleCompletedClick("보석 캐기 챌린지") : navigate("/gem")}
         >
+          {gemCompleted && (
+            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
+              적립완료
+            </Badge>
+          )}
           <CardHeader>
             <div className="text-6xl mb-4 text-center">💎</div>
             <CardTitle className="text-2xl text-center">보석 캐기 챌린지</CardTitle>
@@ -94,16 +122,21 @@ const Index = () => {
                 </p>
               )}
             </div>
-            <Button className="w-full mt-4" size="lg">
-              플레이하기 →
+            <Button className="w-full mt-4" size="lg" disabled={gemCompleted}>
+              {gemCompleted ? "오늘 완료 ✓" : "플레이하기 →"}
             </Button>
           </CardContent>
         </Card>
 
         <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
-          onClick={() => navigate("/fortune")}
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
+          onClick={() => fortuneCompleted ? handleCompletedClick("오늘의 운세") : navigate("/fortune")}
         >
+          {fortuneCompleted && (
+            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
+              적립완료
+            </Badge>
+          )}
           <CardHeader>
             <div className="text-6xl mb-4 text-center">✨</div>
             <CardTitle className="text-2xl text-center">오늘의 운세</CardTitle>
@@ -115,8 +148,8 @@ const Index = () => {
               <p>🍀 행운의 숫자 & 컬러</p>
               <p>📅 양력/음력 선택 가능</p>
             </div>
-            <Button className="w-full mt-4" size="lg">
-              운세 보기 →
+            <Button className="w-full mt-4" size="lg" disabled={fortuneCompleted}>
+              {fortuneCompleted ? "오늘 완료 ✓" : "운세 보기 →"}
             </Button>
           </CardContent>
         </Card>
