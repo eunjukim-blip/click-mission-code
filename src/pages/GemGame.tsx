@@ -241,6 +241,14 @@ const GemGame = () => {
                 🎁 리워드 받기
               </Button>
             )}
+            <Button
+              onClick={() => navigate("/")}
+              variant="outline"
+              size="lg"
+              className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
+            >
+              🏠 미니게임 홈으로
+            </Button>
           </div>
         </div>
       )}
