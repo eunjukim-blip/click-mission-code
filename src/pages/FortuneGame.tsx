@@ -1,10 +1,34 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
+
+// 띠별 기준 연도 (쥐띠 = 0, 소띠 = 1, ..., 돼지띠 = 11)
+const zodiacBaseYears: Record<Zodiac, number> = {
+  "쥐": 0, "소": 1, "호랑이": 2, "토끼": 3, "용": 4, "뱀": 5,
+  "말": 6, "양": 7, "원숭이": 8, "닭": 9, "개": 10, "돼지": 11
+};
+
+// 현재 연도 기준으로 10세~100세에 해당하는 출생연도 계산
+const getZodiacYears = (zodiac: Zodiac): number[] => {
+  const currentYear = 2025;
+  const minAge = 10;
+  const maxAge = 100;
+  const years: number[] = [];
+  
+  const baseOffset = zodiacBaseYears[zodiac];
+  
+  for (let age = minAge; age <= maxAge; age++) {
+    const birthYear = currentYear - age;
+    // 12년 주기로 체크
+    if ((birthYear - 1924 - baseOffset) % 12 === 0) {
+      years.push(birthYear);
+    }
+  }
+  
+  return years.sort((a, b) => b - a); // 최신순 정렬
+};
 
 type Zodiac = "쥐" | "소" | "호랑이" | "토끼" | "용" | "뱀" | "말" | "양" | "원숭이" | "닭" | "개" | "돼지";
 
@@ -142,17 +166,28 @@ const FortuneGame = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                {zodiacList.map((zodiac) => (
-                  <button
-                    key={zodiac}
-                    onClick={() => handleZodiacSelect(zodiac)}
-                    className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50 transition-all hover:scale-105 active:scale-95"
-                  >
-                    <span className="text-4xl mb-2">{zodiacFortunes[zodiac].emoji}</span>
-                    <span className="text-base font-bold text-foreground">{zodiac}띠</span>
-                  </button>
-                ))}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {zodiacList.map((zodiac) => {
+                  const years = getZodiacYears(zodiac);
+                  return (
+                    <button
+                      key={zodiac}
+                      onClick={() => handleZodiacSelect(zodiac)}
+                      className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50 transition-all hover:scale-105 active:scale-95"
+                    >
+                      <span className="text-5xl mb-2">{zodiacFortunes[zodiac].emoji}</span>
+                      <span className="text-lg font-bold text-foreground mb-2">{zodiac}띠</span>
+                      <div className="text-xs text-muted-foreground text-center">
+                        {years.map((year, idx) => (
+                          <span key={year}>
+                            {year}
+                            {idx < years.length - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
