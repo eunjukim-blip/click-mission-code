@@ -130,13 +130,20 @@ const zodiacList: Zodiac[] = ["쥐", "소", "호랑이", "토끼", "용", "뱀",
 const FortuneGame = () => {
   const navigate = useNavigate();
   const [selectedZodiac, setSelectedZodiac] = useState<Zodiac | null>(null);
+  const [selectedYear, setSelectedYear] = useState<number | null>(null);
 
   const handleZodiacSelect = (zodiac: Zodiac) => {
     setSelectedZodiac(zodiac);
+    setSelectedYear(null);
+  };
+
+  const handleYearSelect = (year: number) => {
+    setSelectedYear(year);
   };
 
   const resetForm = () => {
     setSelectedZodiac(null);
+    setSelectedYear(null);
   };
 
   return (
@@ -166,29 +173,51 @@ const FortuneGame = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {zodiacList.map((zodiac) => {
-                  const years = getZodiacYears(zodiac);
-                  return (
-                    <button
-                      key={zodiac}
-                      onClick={() => handleZodiacSelect(zodiac)}
-                      className="flex flex-col items-center justify-center p-4 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50 transition-all hover:scale-105 active:scale-95"
-                    >
-                      <span className="text-5xl mb-2">{zodiacFortunes[zodiac].emoji}</span>
-                      <span className="text-lg font-bold text-foreground mb-2">{zodiac}띠</span>
-                      <div className="text-xs text-muted-foreground text-center">
-                        {years.map((year, idx) => (
-                          <span key={year}>
-                            {year}
-                            {idx < years.length - 1 ? ", " : ""}
-                          </span>
-                        ))}
-                      </div>
-                    </button>
-                  );
-                })}
+              <div className="grid grid-cols-3 md:grid-cols-4 gap-4">
+                {zodiacList.map((zodiac) => (
+                  <button
+                    key={zodiac}
+                    onClick={() => handleZodiacSelect(zodiac)}
+                    className="flex flex-col items-center justify-center p-6 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50 transition-all hover:scale-105 active:scale-95"
+                  >
+                    <span className="text-5xl mb-2">{zodiacFortunes[zodiac].emoji}</span>
+                    <span className="text-base font-bold text-foreground">{zodiac}띠</span>
+                  </button>
+                ))}
               </div>
+            </CardContent>
+          </Card>
+        ) : !selectedYear ? (
+          <Card className="shadow-xl border-2 border-orange-200">
+            <CardHeader className="space-y-2">
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="text-5xl">{zodiacFortunes[selectedZodiac].emoji}</span>
+                <CardTitle className="text-2xl">{selectedZodiac}띠</CardTitle>
+              </div>
+              <CardDescription className="text-center text-base">
+                태어난 연도를 선택하세요
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-h-96 overflow-y-auto">
+                {getZodiacYears(selectedZodiac).map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => handleYearSelect(year)}
+                    className="p-4 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:bg-orange-50 transition-all hover:scale-105 active:scale-95 text-lg font-semibold"
+                  >
+                    {year}년
+                  </button>
+                ))}
+              </div>
+              <Button
+                onClick={() => setSelectedZodiac(null)}
+                variant="outline"
+                className="w-full"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                띠 다시 선택
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -196,10 +225,10 @@ const FortuneGame = () => {
             <CardHeader>
               <CardTitle className="text-2xl text-center text-orange-700 flex items-center justify-center gap-3">
                 <span className="text-5xl">{zodiacFortunes[selectedZodiac].emoji}</span>
-                {selectedZodiac}띠 오늘의 운세
+                {selectedZodiac}띠 ({selectedYear}년생) 오늘의 운세
               </CardTitle>
               <CardDescription className="text-center text-base">
-                {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                {new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })} · {2025 - selectedYear}세
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
