@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
@@ -38,8 +37,6 @@ const FortuneGame = () => {
   const navigate = useNavigate();
   const [name, setName] = useState("");
   const [birthdate, setBirthdate] = useState("");
-  const [calendarType, setCalendarType] = useState("solar");
-  const [birthtime, setBirthtime] = useState("");
   const [result, setResult] = useState<typeof fortunes[0] | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -57,8 +54,6 @@ const FortuneGame = () => {
     setResult(null);
     setName("");
     setBirthdate("");
-    setCalendarType("solar");
-    setBirthtime("");
   };
 
   return (
@@ -114,43 +109,6 @@ const FortuneGame = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="calendarType">달력 종류</Label>
-                  <Select value={calendarType} onValueChange={setCalendarType}>
-                    <SelectTrigger id="calendarType" className="text-base">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      <SelectItem value="solar">양력</SelectItem>
-                      <SelectItem value="lunar">음력</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="birthtime">출산 시간 (선택)</Label>
-                  <Select value={birthtime} onValueChange={setBirthtime}>
-                    <SelectTrigger id="birthtime" className="text-base">
-                      <SelectValue placeholder="출산 시간을 선택하세요" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background">
-                      <SelectItem value="">선택 안함</SelectItem>
-                      <SelectItem value="01:00">01:00</SelectItem>
-                      <SelectItem value="03:00">03:00</SelectItem>
-                      <SelectItem value="05:00">05:00</SelectItem>
-                      <SelectItem value="07:00">07:00</SelectItem>
-                      <SelectItem value="09:00">09:00</SelectItem>
-                      <SelectItem value="11:00">11:00</SelectItem>
-                      <SelectItem value="13:00">13:00</SelectItem>
-                      <SelectItem value="15:00">15:00</SelectItem>
-                      <SelectItem value="17:00">17:00</SelectItem>
-                      <SelectItem value="19:00">19:00</SelectItem>
-                      <SelectItem value="21:00">21:00</SelectItem>
-                      <SelectItem value="23:00">23:00</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
                 <Button type="submit" className="w-full text-base" size="lg">
                   <Sparkles className="mr-2 h-5 w-5" />
                   운세 보기
@@ -164,9 +122,6 @@ const FortuneGame = () => {
               <CardTitle className="text-2xl text-center text-orange-700">
                 {name}님의 오늘의 운세
               </CardTitle>
-              <CardDescription className="text-center text-base">
-                ({calendarType === "lunar" ? "음력" : "양력"} 기준)
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-4">
