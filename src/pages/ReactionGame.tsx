@@ -69,6 +69,20 @@ const ReactionGame = () => {
     });
   }, []);
 
+  // Auto-fail if no tap within 5 seconds after ready
+  useEffect(() => {
+    if (stage === "ready") {
+      const timeout = setTimeout(() => {
+        setStage("result");
+        setGameColor("gray");
+        setResultMessage("시간 초과! ⏰");
+        setReactionTime(null);
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [stage]);
+
   // Keyboard support (Space bar)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
