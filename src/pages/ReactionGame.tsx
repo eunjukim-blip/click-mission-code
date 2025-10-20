@@ -153,7 +153,12 @@ const ReactionGame = () => {
               ⚡ 0.15초 보다 빠르면 리워드 적립!
             </p>
           </div>
-          <GameCard color="blue">준비하세요!</GameCard>
+          <div className="relative">
+            <h2 className="text-2xl font-bold text-foreground mb-4 text-center">
+              준비하세요!
+            </h2>
+            <GameCard color="blue" />
+          </div>
           <Button
             onClick={startGame}
             size="lg"
