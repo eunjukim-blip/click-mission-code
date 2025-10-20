@@ -41,17 +41,10 @@ const Index = () => {
   }, []);
 
   const handleRewardClick = useCallback(() => {
-    toast("광고 시청 중...", {
-      description: "잠시만 기다려주세요!",
-      duration: 2000,
+    toast.success("축하합니다! 🎁", {
+      description: "리워드가 지급되었습니다!",
+      duration: 3000,
     });
-    
-    setTimeout(() => {
-      toast.success("축하합니다! 🎁", {
-        description: "리워드가 지급되었습니다!",
-        duration: 3000,
-      });
-    }, 2000);
   }, []);
 
   // Timer countdown
@@ -233,7 +226,7 @@ const Index = () => {
                 size="lg"
                 className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
               >
-                🎬 광고 보고 리워드 받기
+                🎁 리워드 받기
               </Button>
             )}
           </div>
