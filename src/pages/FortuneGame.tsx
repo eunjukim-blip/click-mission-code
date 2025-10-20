@@ -272,7 +272,7 @@ const FortuneGame = () => {
           </Button>
           <h1 className="text-3xl md:text-4xl font-black text-orange-600 flex items-center gap-2">
             <Sparkles className="h-8 w-8" />
-            오늘의 운세
+            데일리미션
           </h1>
         </div>
 
