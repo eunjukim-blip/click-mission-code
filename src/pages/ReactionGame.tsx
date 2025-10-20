@@ -180,9 +180,7 @@ const ReactionGame = () => {
               캐릭터가 여우로 바뀔 때 터치하세요
             </p>
           </div>
-          <GameCard color={gameColor} onClick={handleTap}>
-            {gameColor === "red" ? "지금!" : ""}
-          </GameCard>
+          <GameCard color={gameColor} onClick={handleTap} />
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
       )}
