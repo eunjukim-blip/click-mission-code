@@ -35,7 +35,6 @@ export const GameCard = ({ color, onClick, children }: GameCardProps) => {
       onClick={onClick}
       className={`
         relative flex flex-col items-center justify-center gap-4
-        transition-all duration-300
         ${onClick ? "cursor-pointer hover:scale-110 active:scale-95" : ""}
         ${isAnimating ? "animate-wiggle" : ""}
       `}
@@ -43,9 +42,10 @@ export const GameCard = ({ color, onClick, children }: GameCardProps) => {
       <img
         src={characterMap[color]}
         alt={`${color} character`}
-        className={`w-64 h-64 object-contain drop-shadow-2xl ${
+        className={`w-64 h-64 object-contain drop-shadow-2xl transition-all duration-200 ${
           color === "blue" ? "animate-bounce" : ""
         }`}
+        style={{ imageRendering: 'crisp-edges' }}
       />
       {children && (
         <div className="text-foreground font-bold text-2xl text-center bg-white/90 px-6 py-3 rounded-full shadow-lg">
