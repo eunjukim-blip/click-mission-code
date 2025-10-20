@@ -8,7 +8,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 gap-8">
       <div className="text-center mb-8 animate-in fade-in duration-500">
-        <h1 className="text-6xl font-black text-foreground mb-4">
+        <h1 className="text-4xl md:text-6xl font-black text-foreground mb-4">
           게임 센터 🎮
         </h1>
         <p className="text-xl text-muted-foreground">
@@ -32,7 +32,6 @@ const Index = () => {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>⚡ 0.15초 이하면 리워드 획득</p>
               <p>🎯 반응속도 측정</p>
-              <p>🦊 귀여운 캐릭터</p>
             </div>
             <Button className="w-full mt-4" size="lg">
               플레이하기 →
@@ -54,8 +53,7 @@ const Index = () => {
           <CardContent>
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>⏱️ 20초 시간 제한</p>
-              <p>🎯 120번 클릭 목표</p>
-              <p>💎 보석 획득 도전</p>
+              <p>🎯 120번 클릭 하면 보석획득!</p>
             </div>
             <Button className="w-full mt-4" size="lg">
               플레이하기 →
