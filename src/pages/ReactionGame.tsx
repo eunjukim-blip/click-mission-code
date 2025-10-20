@@ -243,7 +243,7 @@ const ReactionGame = () => {
       )}
 
       {/* Footer */}
-      <div className="fixed bottom-4 text-center text-xs text-muted-foreground">
+      <div className="fixed bottom-8 text-center text-xs text-muted-foreground">
         귀여운 캐릭터 반응속도 게임 ✨
       </div>
     </div>
