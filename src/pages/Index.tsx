@@ -149,7 +149,7 @@ const Index = () => {
               size="lg"
               className="text-lg px-8 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
             >
-              다시 하기 🔄
+              🎬 광고 보고 다시하기
             </Button>
             {reactionTime !== null && reactionTime <= 150 && (
               <Button
