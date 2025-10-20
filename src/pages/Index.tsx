@@ -12,7 +12,7 @@ const Index = () => {
           게임 센터 🎮
         </h1>
         <p className="text-xl text-muted-foreground">
-          원하는 게임을 선택하세요!
+          원하는 게임을 선택하고 리워드를 받으세요!
         </p>
       </div>
 
