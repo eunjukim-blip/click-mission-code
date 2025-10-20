@@ -7,7 +7,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
-      <div className="text-center mb-4 animate-in fade-in duration-500">
+      <div className="text-center mb-4 mt-8 animate-in fade-in duration-500">
         <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">
           게임 센터 🎮
         </h1>
