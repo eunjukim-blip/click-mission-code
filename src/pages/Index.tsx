@@ -208,10 +208,7 @@ const Index = () => {
 
           <div className="w-48 h-48 flex items-center justify-center">
             {clicks >= TARGET_CLICKS ? (
-              <div className="relative">
-                <div className="text-8xl animate-bounce">💎</div>
-                <div className="absolute inset-0 text-6xl animate-pulse">✨</div>
-              </div>
+              <div className="text-9xl animate-bounce">💎</div>
             ) : (
               <div className="relative">
                 <div className="w-40 h-40 bg-gradient-to-br from-gray-400 to-gray-500 rounded-lg rotate-45 opacity-50">
