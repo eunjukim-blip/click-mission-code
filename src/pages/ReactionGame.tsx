@@ -36,10 +36,11 @@ const ReactionGame = () => {
     const delay = Math.random() * 3000 + 2000;
     
     setTimeout(() => {
-      // 모든 상태를 동시에 변경
+      // 모든 상태를 동시에 변경 - requestAnimationFrame으로 동기화
+      const now = Date.now();
+      setStartTime(now);
       setGameColor("red");
       setStage("ready");
-      setStartTime(Date.now());
     }, delay);
   }, []);
 
@@ -175,7 +176,7 @@ const ReactionGame = () => {
             </p>
           </div>
           <GameCard color={gameColor} onClick={handleTap}>
-            {stage === "waiting" ? "터치!" : "지금!"}
+            {gameColor === "red" ? "지금!" : "터치!"}
           </GameCard>
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
