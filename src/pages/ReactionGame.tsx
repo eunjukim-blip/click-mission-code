@@ -25,9 +25,10 @@ const ReactionGame = () => {
     const delay = Math.random() * 3000 + 2000;
     
     setTimeout(() => {
+      // 모든 상태를 동시에 변경
       setGameColor("red");
-      setStartTime(Date.now());
       setStage("ready");
+      setStartTime(Date.now());
     }, delay);
   }, []);
 
