@@ -81,10 +81,10 @@ const Index = () => {
           </h1>
           <div className="text-center space-y-3">
             <p className="text-xl text-muted-foreground">
-              20초 안에 돌을 120번 캐세요!
+              돌을 깨고 보석을 캐내세요!
             </p>
             <p className="text-lg text-primary font-semibold">
-              ⚡ 성공하면 리워드를 받을 수 있어요!
+              ⚡ 20초안에 120을 클릭하면 보석획득!
             </p>
           </div>
           <div className="w-48 h-48 flex items-center justify-center">
