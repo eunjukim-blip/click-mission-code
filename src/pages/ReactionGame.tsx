@@ -147,7 +147,7 @@ const ReactionGame = () => {
           </h1>
           <div className="text-center">
             <p className="text-xl text-muted-foreground mb-2">
-              여우로 바뀔 때만 터치하세요!
+              토끼가 여우로 바뀔 때 터치하세요!
             </p>
             <p className="text-lg text-primary font-semibold">
               ⚡ 0.15초 보다 빠르면 리워드 적립!
