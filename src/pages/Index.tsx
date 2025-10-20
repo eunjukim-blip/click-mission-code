@@ -9,7 +9,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
       <div className="text-center mb-4 mt-8 animate-in fade-in duration-500">
         <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">게임 센터 🎮</h1>
-        <p className="text-2xl text-muted-foreground">원하는 게임을 선택하고 리워드를 받으세요!</p>
+        <p className="text-xl text-muted-foreground">원하는 게임을 선택하고 리워드를 받으세요!</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full animate-in fade-in duration-700">
