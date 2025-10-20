@@ -99,12 +99,16 @@ const fortunePatterns = [
   }
 ];
 
-// 연도를 기반으로 운세 인덱스 생성 (같은 연도는 항상 같은 운세)
+// 연도와 날짜를 기반으로 운세 인덱스 생성 (같은 연도 + 같은 날짜는 항상 같은 운세)
 const getFortuneForYear = (year: number) => {
-  const index = year % fortunePatterns.length;
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
+  // 연도와 일자를 조합하여 인덱스 생성
+  const combinedValue = year + dayOfYear;
+  const index = combinedValue % fortunePatterns.length;
   const fortune = fortunePatterns[index];
-  // 연도 기반으로 행운의 숫자도 다르게
-  const luckyNumber = ((year * 7) % 12) + 1;
+  // 연도와 날짜 기반으로 행운의 숫자도 다르게
+  const luckyNumber = ((year * 7 + dayOfYear * 3) % 12) + 1;
   return { ...fortune, luckyNumber };
 };
 
