@@ -58,6 +58,10 @@ const GemGame = () => {
       setTimeLeft((prev) => {
         if (prev <= 0.1) {
           setStage("result");
+          // 실패시 진동
+          if (clicks < TARGET_CLICKS && 'vibrate' in navigator) {
+            navigator.vibrate([200, 100, 200]);
+          }
           return 0;
         }
         return prev - 0.1;
@@ -81,7 +85,7 @@ const GemGame = () => {
       {/* Intro Screen */}
       {stage === "intro" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500 max-w-md">
-          <h1 className="text-5xl font-black text-foreground mb-2 text-center">
+          <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 text-center">
             보석 캐기 챌린지 💎
           </h1>
           <div className="text-center space-y-3">
@@ -127,7 +131,7 @@ const GemGame = () => {
 
           <div 
             onClick={handleBalloonClick}
-            className="relative flex items-center justify-center cursor-pointer select-none mt-8 w-48 h-48"
+            className="relative flex items-center justify-center cursor-pointer select-none mt-8 w-48 h-48 active:scale-90 transition-transform duration-100"
           >
             {clicks >= TARGET_CLICKS ? (
               // 보석 등장!
