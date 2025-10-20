@@ -35,13 +35,15 @@ const ReactionGame = () => {
 
     // Random delay between 2-5 seconds
     const delay = Math.random() * 3000 + 2000;
-    
+  
     setTimeout(() => {
-      const redTime = Date.now();
-      setStartTime(redTime);
       setGameColor("red");
       setStage("ready");
     }, delay);
+  }, []);
+
+  const handleRedVisible = useCallback(() => {
+    setStartTime(Date.now());
   }, []);
 
   const handleTap = useCallback(() => {
@@ -181,7 +183,7 @@ const ReactionGame = () => {
               캐릭터가 여우로 바뀔 때 터치하세요
             </p>
           </div>
-          <GameCard color={gameColor} onClick={handleTap}>
+          <GameCard color={gameColor} onClick={handleTap} onRedVisible={handleRedVisible}>
             {gameColor === "red" ? "터치" : ""}
           </GameCard>
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
