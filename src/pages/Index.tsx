@@ -40,7 +40,7 @@ const Index = () => {
         <p className="text-xl text-muted-foreground">원하는 게임을 선택하고 리워드를 받으세요!</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full animate-in fade-in duration-700">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full animate-in fade-in duration-700">
         <Card
           className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
           onClick={() => navigate("/reaction")}
@@ -87,6 +87,27 @@ const Index = () => {
             </div>
             <Button className="w-full mt-4" size="lg">
               플레이하기 →
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
+          onClick={() => navigate("/fortune")}
+        >
+          <CardHeader>
+            <div className="text-6xl mb-4 text-center">✨</div>
+            <CardTitle className="text-2xl text-center">오늘의 운세</CardTitle>
+            <CardDescription className="text-center text-base">나의 오늘 운세를 확인해보세요!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>🔮 오늘의 운세 점수</p>
+              <p>🍀 행운의 숫자 & 컬러</p>
+              <p>📅 양력/음력 선택 가능</p>
+            </div>
+            <Button className="w-full mt-4" size="lg">
+              운세 보기 →
             </Button>
           </CardContent>
         </Card>
