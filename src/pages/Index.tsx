@@ -96,19 +96,22 @@ const Index = () => {
       {stage === "intro" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500 max-w-md">
           <h1 className="text-5xl font-black text-foreground mb-2 text-center">
-            풍선 클릭 챌린지 🎈
+            보석 캐기 챌린지 💎
           </h1>
           <div className="text-center space-y-3">
             <p className="text-xl text-muted-foreground">
-              20초 안에 풍선을 120번 터트리세요!
+              20초 안에 돌을 120번 캐세요!
             </p>
             <p className="text-lg text-primary font-semibold">
               ⚡ 성공하면 리워드를 받을 수 있어요!
             </p>
           </div>
           <div className="w-48 h-48 flex items-center justify-center">
-            <div className="w-32 h-40 bg-gradient-to-b from-pink-400 to-pink-500 rounded-full relative animate-bounce">
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-12 bg-white/30 rounded-full blur-sm"></div>
+            <div className="relative">
+              <div className="w-40 h-40 bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 rounded-lg rotate-45 shadow-2xl animate-pulse">
+                <div className="absolute inset-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-sm"></div>
+              </div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-4xl">⛏️</div>
             </div>
           </div>
           <Button
@@ -140,26 +143,41 @@ const Index = () => {
             onClick={handleBalloonClick}
             className="relative flex items-center justify-center cursor-pointer select-none mt-8"
           >
-            <div 
-              className={`w-32 h-40 bg-gradient-to-b from-pink-400 to-pink-500 rounded-full relative transition-all duration-200
-                ${isPopping ? 'scale-0 opacity-0' : 'hover:scale-110 active:scale-95'}
-              `}
-              style={{ 
-                transform: `scale(${isPopping ? 0 : balloonScale})`,
-              }}
-            >
-              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-12 bg-white/30 rounded-full blur-sm"></div>
-              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-foreground/30"></div>
-            </div>
-            {isPopping && (
+            {!isPopping ? (
+              <div className="relative">
+                <div 
+                  className="w-40 h-40 bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 rounded-lg rotate-45 shadow-2xl transition-all duration-200 hover:scale-110 active:scale-95"
+                  style={{ 
+                    transform: `rotate(45deg) scale(${balloonScale})`,
+                  }}
+                >
+                  {/* 균열 효과 */}
+                  {clicks % 10 > 3 && (
+                    <div className="absolute inset-0 overflow-hidden rounded-lg">
+                      <div className="absolute top-0 left-1/2 w-0.5 h-full bg-black/40 rotate-12"></div>
+                      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-black/40 -rotate-12"></div>
+                    </div>
+                  )}
+                  {clicks % 10 > 6 && (
+                    <div className="absolute inset-0 overflow-hidden rounded-lg">
+                      <div className="absolute top-0 right-1/4 w-0.5 h-full bg-black/40 -rotate-12"></div>
+                      <div className="absolute top-1/4 left-0 w-full h-0.5 bg-black/40 rotate-12"></div>
+                    </div>
+                  )}
+                  <div className="absolute inset-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-sm"></div>
+                </div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl pointer-events-none">⛏️</div>
+              </div>
+            ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-6xl animate-ping">💥</span>
+                <div className="text-8xl animate-ping">💎</div>
+                <div className="absolute text-6xl">✨</div>
               </div>
             )}
           </div>
           
           <p className="text-muted-foreground text-center">
-            풍선을 빠르게 클릭하세요!
+            돌을 빠르게 캐세요! 보석이 나올 거예요!
           </p>
         </div>
       )}
@@ -185,10 +203,15 @@ const Index = () => {
 
           <div className="w-48 h-48 flex items-center justify-center">
             {clicks >= TARGET_CLICKS ? (
-              <div className="text-8xl animate-bounce">🎁</div>
+              <div className="relative">
+                <div className="text-8xl animate-bounce">💎</div>
+                <div className="absolute inset-0 text-6xl animate-pulse">✨</div>
+              </div>
             ) : (
-              <div className="w-32 h-40 bg-gradient-to-b from-gray-400 to-gray-500 rounded-full relative opacity-50">
-                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-12 bg-white/30 rounded-full blur-sm"></div>
+              <div className="relative">
+                <div className="w-40 h-40 bg-gradient-to-br from-gray-400 to-gray-500 rounded-lg rotate-45 opacity-50">
+                  <div className="absolute inset-4 bg-gradient-to-br from-gray-300 to-gray-400 rounded-sm"></div>
+                </div>
               </div>
             )}
           </div>
@@ -217,7 +240,7 @@ const Index = () => {
 
       {/* Footer */}
       <div className="fixed bottom-4 text-center text-xs text-muted-foreground">
-        풍선 클릭 챌린지 🎈 빠르게 터트려보세요!
+        보석 캐기 챌린지 💎 열심히 캐보세요!
       </div>
     </div>
   );
