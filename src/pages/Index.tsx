@@ -103,9 +103,14 @@ const Index = () => {
       {/* Game Screen */}
       {(stage === "waiting" || stage === "ready") && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-300">
-          <h2 className="text-3xl font-bold text-foreground">
-            {stage === "waiting" ? "기다려요..." : "지금 터치!"}
-          </h2>
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-foreground mb-2">
+              {stage === "waiting" ? "기다려요..." : "지금 터치!"}
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              캐릭터가 여우로 바뀔 때 터치하세요
+            </p>
+          </div>
           <GameCard color={gameColor} onClick={handleTap}>
             {stage === "waiting" ? "터치!" : "지금!"}
           </GameCard>
