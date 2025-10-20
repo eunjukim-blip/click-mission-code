@@ -101,7 +101,7 @@ const ReactionGame = () => {
       {/* Intro Screen */}
       {stage === "intro" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
-          <h1 className="text-5xl font-black text-foreground mb-2 text-center">
+          <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 text-center">
             캐릭터 반응 게임 🎨
           </h1>
           <div className="text-center">
