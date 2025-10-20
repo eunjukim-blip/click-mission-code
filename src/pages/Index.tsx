@@ -45,7 +45,7 @@ const Index = () => {
       </div>
       
       <div className="text-center mb-4 animate-in fade-in duration-500">
-        <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">미션 센터 🎯</h1>
+        <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">데일리미션 🎯</h1>
         <p className="text-xl text-muted-foreground">원하는 미션을 선택하고 리워드를 받으세요!</p>
       </div>
 
