@@ -24,7 +24,7 @@ const Index = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm text-muted-foreground">
-              <p>⚡ 0.15초 이하면 리워드 획득</p>
+              <p>⚡ 반응속도가 0.15초 보다 빠르면 리워드 적립!</p>
               <p>🎯 반응속도 측정</p>
             </div>
             <Button className="w-full mt-4" size="lg">
