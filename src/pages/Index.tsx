@@ -54,7 +54,7 @@ const Index = () => {
         </Card>
       </div>
 
-      <div className="fixed bottom-4 text-center text-xs text-muted-foreground">즐거운 게임 되세요! ✨</div>
+      <div className="mt-8 text-center text-xs text-muted-foreground">즐거운 게임 되세요! ✨</div>
     </div>
   );
 };
