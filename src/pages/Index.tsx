@@ -43,7 +43,7 @@ const Index = () => {
       setStage("result");
       setGameColor("red");
       const timeInSeconds = (time / 1000).toFixed(2);
-      if (time <= 1250) {
+      if (time <= 150) {
         setResultMessage(`${timeInSeconds}초 - 리워드를 받을 수 있어요! 🎁`);
       } else {
         setResultMessage(`반응속도: ${timeInSeconds}초 🎯`);
@@ -133,10 +133,10 @@ const Index = () => {
             </Button>
             {reactionTime !== null && (
               <p className="text-center text-muted-foreground text-sm">
-                {reactionTime <= 1250
-                  ? "🏆 최고의 반응속도!"
+                {reactionTime <= 150
+                  ? "🏆 최고의 반응속도! 리워드 획득!"
                   : reactionTime < 200
-                  ? "놀라운 반응속도! 🏆"
+                  ? "조금만 더 빨리! (리워드는 0.15초 이하)"
                   : reactionTime < 300
                   ? "훌륭해요! 👏"
                   : reactionTime < 500
