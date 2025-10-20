@@ -8,25 +8,19 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
       <div className="text-center mb-4 mt-8 animate-in fade-in duration-500">
-        <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">
-          게임 센터 🎮
-        </h1>
-        <p className="text-xl text-muted-foreground">
-          원하는 게임을 선택하고 리워드를 받으세요!
-        </p>
+        <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">게임 센터 🎮</h1>
+        <p className="text-2xl text-muted-foreground">원하는 게임을 선택하고 리워드를 받으세요!</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full animate-in fade-in duration-700">
-        <Card 
+        <Card
           className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
           onClick={() => navigate("/reaction")}
         >
           <CardHeader>
             <div className="text-6xl mb-4 text-center">🎨</div>
             <CardTitle className="text-2xl text-center">캐릭터 반응 게임</CardTitle>
-            <CardDescription className="text-center text-base">
-              여우로 바뀔 때 빠르게 반응하세요!
-            </CardDescription>
+            <CardDescription className="text-center text-base">여우로 바뀔 때 빠르게 반응하세요!</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm text-muted-foreground">
@@ -39,16 +33,14 @@ const Index = () => {
           </CardContent>
         </Card>
 
-        <Card 
+        <Card
           className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl"
           onClick={() => navigate("/gem")}
         >
           <CardHeader>
             <div className="text-6xl mb-4 text-center">💎</div>
             <CardTitle className="text-2xl text-center">보석 캐기 챌린지</CardTitle>
-            <CardDescription className="text-center text-base">
-              20초 안에 돌을 깨고 보석을 캐내세요!
-            </CardDescription>
+            <CardDescription className="text-center text-base">20초 안에 돌을 깨고 보석을 캐내세요!</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2 text-sm text-muted-foreground">
@@ -62,9 +54,7 @@ const Index = () => {
         </Card>
       </div>
 
-      <div className="fixed bottom-4 text-center text-xs text-muted-foreground">
-        즐거운 게임 되세요! ✨
-      </div>
+      <div className="fixed bottom-4 text-center text-xs text-muted-foreground">즐거운 게임 되세요! ✨</div>
     </div>
   );
 };
