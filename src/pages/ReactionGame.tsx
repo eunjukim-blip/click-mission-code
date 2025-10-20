@@ -146,7 +146,7 @@ const ReactionGame = () => {
             캐릭터 반응 게임 🎨
           </h1>
           <div className="text-center">
-            <p className="text-xl text-muted-foreground mb-2">
+            <p className="text-lg text-muted-foreground mb-2">
               토끼가 여우로 바뀔 때 터치하세요!
             </p>
             <p className="text-lg text-primary font-semibold">
