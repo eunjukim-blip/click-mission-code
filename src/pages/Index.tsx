@@ -101,9 +101,14 @@ const Index = () => {
           <h1 className="text-5xl font-black text-foreground mb-2">
             캐릭터 반응 게임 🎨
           </h1>
-          <p className="text-xl text-muted-foreground mb-4">
-            여우로 바뀔 때만 터치하세요!
-          </p>
+          <div className="text-center">
+            <p className="text-xl text-muted-foreground mb-2">
+              여우로 바뀔 때만 터치하세요!
+            </p>
+            <p className="text-lg text-primary font-semibold">
+              ⚡ 반응속도가 0.15초보다 빠르면 리워드를 받을 수 있어요!
+            </p>
+          </div>
           <GameCard color="blue">준비하세요!</GameCard>
           <Button
             onClick={startGame}
