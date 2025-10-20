@@ -31,14 +31,12 @@ const ReactionGame = () => {
     setStage("waiting");
     setGameColor("blue");
     setReactionTime(null);
+    setStartTime(null);
 
     // Random delay between 2-5 seconds
     const delay = Math.random() * 3000 + 2000;
     
     setTimeout(() => {
-      // 모든 상태를 동시에 변경 - requestAnimationFrame으로 동기화
-      const now = Date.now();
-      setStartTime(now);
       setGameColor("red");
       setStage("ready");
     }, delay);
@@ -94,6 +92,16 @@ const ReactionGame = () => {
       duration: 3000,
     });
   }, []);
+
+  // Set start time when character actually changes to red fox
+  useEffect(() => {
+    if (stage === "ready" && gameColor === "red") {
+      // Use requestAnimationFrame to ensure the render has completed
+      requestAnimationFrame(() => {
+        setStartTime(Date.now());
+      });
+    }
+  }, [stage, gameColor]);
 
   // Auto-fail if no tap within 5 seconds after ready
   useEffect(() => {
