@@ -185,7 +185,7 @@ const GemGame = () => {
           
           <p className="text-muted-foreground text-center">
             {clicks < 50 
-              ? "돌을 계속 캐보세요!" 
+              ? "돌을 터치하세요!" 
               : clicks < 100 
               ? "반쯤 왔어요! 계속!" 
               : clicks < TARGET_CLICKS
