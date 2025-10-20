@@ -79,10 +79,10 @@ const Index = () => {
       {stage === "intro" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
           <h1 className="text-5xl font-black text-foreground mb-2">
-            색깔 반응 게임 🎨
+            캐릭터 반응 게임 🎨
           </h1>
           <p className="text-xl text-muted-foreground mb-4">
-            빨간색으로 바뀔 때만 터치하세요!
+            여우로 바뀔 때만 터치하세요!
           </p>
           <GameCard color="blue">준비하세요!</GameCard>
           <Button
@@ -104,7 +104,7 @@ const Index = () => {
           <GameCard color={gameColor} onClick={handleTap}>
             {stage === "waiting" ? "터치!" : "지금!"}
           </GameCard>
-          <p className="text-muted-foreground">* 박스를 터치하세요</p>
+          <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
       )}
 
@@ -138,7 +138,7 @@ const Index = () => {
 
       {/* Footer */}
       <div className="fixed bottom-4 text-center text-xs text-muted-foreground">
-        귀여운 캐릭터와 함께하는 반응속도 게임 ✨
+        귀여운 캐릭터 반응속도 게임 ✨
       </div>
     </div>
   );
