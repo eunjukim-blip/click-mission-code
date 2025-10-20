@@ -1,63 +1,62 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { GameCard } from "@/components/GameCard";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 
-type GameStage = "intro" | "waiting" | "ready" | "result";
-type GameColor = "blue" | "red" | "green" | "gray";
+type GameStage = "intro" | "playing" | "result";
+
+const TARGET_CLICKS = 120;
+const GAME_DURATION = 20;
 
 const Index = () => {
   const [stage, setStage] = useState<GameStage>("intro");
-  const [gameColor, setGameColor] = useState<GameColor>("blue");
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [reactionTime, setReactionTime] = useState<number | null>(null);
-  const [resultMessage, setResultMessage] = useState("");
+  const [clicks, setClicks] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
+  const [balloonScale, setBalloonScale] = useState(1);
+  const [isPopping, setIsPopping] = useState(false);
 
   const startGame = useCallback(() => {
-    setStage("waiting");
-    setGameColor("blue");
-    setReactionTime(null);
-
-    // Random delay between 2-5 seconds
-    const delay = Math.random() * 3000 + 2000;
-    
-    const timer = setTimeout(() => {
-      setGameColor("red");
-      setStartTime(Date.now());
-      setStage("ready");
-    }, delay);
-
-    return () => clearTimeout(timer);
+    setStage("playing");
+    setClicks(0);
+    setTimeLeft(GAME_DURATION);
+    setBalloonScale(1);
+    setIsPopping(false);
   }, []);
 
-  const handleTap = useCallback(() => {
-    if (stage === "waiting") {
-      // Too early!
-      setStage("result");
-      setGameColor("gray");
-      setResultMessage("너무 빨라요! 😅");
-      setReactionTime(null);
-    } else if (stage === "ready" && startTime) {
-      // Perfect timing!
-      const time = Date.now() - startTime;
-      setReactionTime(time);
-      setStage("result");
-      setGameColor("red");
-      const timeInSeconds = (time / 1000).toFixed(2);
-      if (time <= 150) {
-        setResultMessage(`${timeInSeconds}초 - 리워드를 받을 수 있어요! 🎁`);
-      } else {
-        setResultMessage(`반응속도: ${timeInSeconds}초 🎯`);
-      }
+  const handleBalloonClick = useCallback(() => {
+    if (stage !== "playing") return;
+
+    const newClicks = clicks + 1;
+    setClicks(newClicks);
+
+    // Balloon grows with each click
+    const scale = 1 + (newClicks % 10) * 0.15;
+    setBalloonScale(scale);
+
+    // Pop animation every 10 clicks
+    if (newClicks % 10 === 0) {
+      setIsPopping(true);
+      setTimeout(() => {
+        setIsPopping(false);
+        setBalloonScale(1);
+      }, 300);
     }
-  }, [stage, startTime]);
+
+    // Check win condition
+    if (newClicks >= TARGET_CLICKS) {
+      setStage("result");
+      toast.success("성공! 🎉", {
+        description: `${TARGET_CLICKS}개 달성!`,
+      });
+    }
+  }, [stage, clicks]);
 
   const retry = useCallback(() => {
     setStage("intro");
-    setGameColor("blue");
-    setStartTime(null);
-    setReactionTime(null);
-    setResultMessage("");
+    setClicks(0);
+    setTimeLeft(GAME_DURATION);
+    setBalloonScale(1);
+    setIsPopping(false);
   }, []);
 
   const handleRewardClick = useCallback(() => {
@@ -74,42 +73,44 @@ const Index = () => {
     }, 2000);
   }, []);
 
-  // Keyboard support (Space bar)
+  // Timer countdown
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        if (stage === "intro") {
-          startGame();
-        } else if (stage === "waiting" || stage === "ready") {
-          handleTap();
-        } else if (stage === "result") {
-          retry();
-        }
-      }
-    };
+    if (stage !== "playing") return;
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [stage, startGame, handleTap, retry]);
+    const interval = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 0.1) {
+          setStage("result");
+          return 0;
+        }
+        return prev - 0.1;
+      });
+    }, 100);
+
+    return () => clearInterval(interval);
+  }, [stage]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 gap-8">
       {/* Intro Screen */}
       {stage === "intro" && (
-        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
-          <h1 className="text-5xl font-black text-foreground mb-2">
-            캐릭터 반응 게임 🎨
+        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500 max-w-md">
+          <h1 className="text-5xl font-black text-foreground mb-2 text-center">
+            풍선 클릭 챌린지 🎈
           </h1>
-          <div className="text-center">
-            <p className="text-xl text-muted-foreground mb-2">
-              여우로 바뀔 때만 터치하세요!
+          <div className="text-center space-y-3">
+            <p className="text-xl text-muted-foreground">
+              20초 안에 풍선을 120번 터트리세요!
             </p>
             <p className="text-lg text-primary font-semibold">
-              ⚡ 반응속도가 0.15초보다 빠르면 리워드를 받을 수 있어요!
+              ⚡ 성공하면 리워드를 받을 수 있어요!
             </p>
           </div>
-          <GameCard color="blue">준비하세요!</GameCard>
+          <div className="w-48 h-48 flex items-center justify-center">
+            <div className="w-32 h-40 bg-gradient-to-b from-pink-400 to-pink-500 rounded-full relative animate-bounce">
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-12 bg-white/30 rounded-full blur-sm"></div>
+            </div>
+          </div>
           <Button
             onClick={startGame}
             size="lg"
@@ -121,29 +122,78 @@ const Index = () => {
       )}
 
       {/* Game Screen */}
-      {(stage === "waiting" || stage === "ready") && (
-        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-300">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-foreground mb-2">
-              {stage === "waiting" ? "기다려요..." : "지금 터치!"}
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              캐릭터가 여우로 바뀔 때 터치하세요
-            </p>
+      {stage === "playing" && (
+        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-300 w-full max-w-md">
+          <div className="w-full space-y-4">
+            <div className="flex justify-between items-center">
+              <div className="text-2xl font-bold text-foreground">
+                ⏱️ {timeLeft.toFixed(1)}초
+              </div>
+              <div className="text-2xl font-bold text-primary">
+                🎈 {clicks}/{TARGET_CLICKS}
+              </div>
+            </div>
+            <Progress value={(clicks / TARGET_CLICKS) * 100} className="h-3" />
           </div>
-          <GameCard color={gameColor} onClick={handleTap}>
-            {stage === "waiting" ? "터치!" : "지금!"}
-          </GameCard>
-          <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
+
+          <div 
+            onClick={handleBalloonClick}
+            className="relative flex items-center justify-center cursor-pointer select-none mt-8"
+          >
+            <div 
+              className={`w-32 h-40 bg-gradient-to-b from-pink-400 to-pink-500 rounded-full relative transition-all duration-200
+                ${isPopping ? 'scale-0 opacity-0' : 'hover:scale-110 active:scale-95'}
+              `}
+              style={{ 
+                transform: `scale(${isPopping ? 0 : balloonScale})`,
+              }}
+            >
+              <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-12 bg-white/30 rounded-full blur-sm"></div>
+              <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-0.5 h-8 bg-foreground/30"></div>
+            </div>
+            {isPopping && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-6xl animate-ping">💥</span>
+              </div>
+            )}
+          </div>
+          
+          <p className="text-muted-foreground text-center">
+            풍선을 빠르게 클릭하세요!
+          </p>
         </div>
       )}
 
       {/* Result Screen */}
       {stage === "result" && (
-        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
-          <h2 className="text-3xl font-bold text-foreground">결과</h2>
-          <GameCard color={gameColor}>{resultMessage}</GameCard>
-          <div className="flex flex-col gap-3">
+        <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500 max-w-md">
+          <h2 className="text-4xl font-bold text-foreground">
+            {clicks >= TARGET_CLICKS ? "🎉 성공!" : "아쉬워요!"}
+          </h2>
+          
+          <div className="text-center space-y-2">
+            <p className="text-3xl font-bold text-primary">
+              {clicks}/{TARGET_CLICKS} 클릭
+            </p>
+            <p className="text-xl text-muted-foreground">
+              {clicks >= TARGET_CLICKS 
+                ? "완벽해요! 리워드를 받으세요! 🎁"
+                : `${TARGET_CLICKS - clicks}개 더 필요했어요!`
+              }
+            </p>
+          </div>
+
+          <div className="w-48 h-48 flex items-center justify-center">
+            {clicks >= TARGET_CLICKS ? (
+              <div className="text-8xl animate-bounce">🎁</div>
+            ) : (
+              <div className="w-32 h-40 bg-gradient-to-b from-gray-400 to-gray-500 rounded-full relative opacity-50">
+                <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-12 bg-white/30 rounded-full blur-sm"></div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-3 w-full">
             <Button
               onClick={retry}
               size="lg"
@@ -151,7 +201,7 @@ const Index = () => {
             >
               🎬 광고 보고 다시하기
             </Button>
-            {reactionTime !== null && reactionTime <= 150 && (
+            {clicks >= TARGET_CLICKS && (
               <Button
                 onClick={handleRewardClick}
                 variant="secondary"
@@ -161,26 +211,13 @@ const Index = () => {
                 🎬 광고 보고 리워드 받기
               </Button>
             )}
-            {reactionTime !== null && (
-              <p className="text-center text-muted-foreground text-sm">
-                {reactionTime <= 150
-                  ? "🏆 최고의 반응속도! 리워드 획득!"
-                  : reactionTime < 200
-                  ? "조금만 더 빨리! (리워드는 0.15초 이하)"
-                  : reactionTime < 300
-                  ? "훌륭해요! 👏"
-                  : reactionTime < 500
-                  ? "잘했어요! 😊"
-                  : "다음엔 더 빠르게! 💪"}
-              </p>
-            )}
           </div>
         </div>
       )}
 
       {/* Footer */}
       <div className="fixed bottom-4 text-center text-xs text-muted-foreground">
-        귀여운 캐릭터 반응속도 게임 ✨
+        풍선 클릭 챌린지 🎈 빠르게 터트려보세요!
       </div>
     </div>
   );
