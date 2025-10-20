@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
@@ -15,6 +15,16 @@ const GemGame = () => {
   const [stage, setStage] = useState<GameStage>("intro");
   const [clicks, setClicks] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
+  const [clickHistory, setClickHistory] = useState<number[]>(() => {
+    const saved = localStorage.getItem("clickHistory");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const averageClicks = useMemo(() => {
+    if (clickHistory.length === 0) return null;
+    const sum = clickHistory.reduce((acc, clicks) => acc + clicks, 0);
+    return sum / clickHistory.length;
+  }, [clickHistory]);
 
   const startGame = useCallback(() => {
     setStage("playing");
@@ -58,6 +68,11 @@ const GemGame = () => {
       setTimeLeft((prev) => {
         if (prev <= 0.1) {
           setStage("result");
+          // 게임 종료 시 클릭 수 저장
+          const newHistory = [...clickHistory, clicks];
+          setClickHistory(newHistory);
+          localStorage.setItem("clickHistory", JSON.stringify(newHistory));
+          
           // 실패시 진동
           if (clicks < TARGET_CLICKS && 'vibrate' in navigator) {
             navigator.vibrate([200, 100, 200]);
@@ -69,7 +84,7 @@ const GemGame = () => {
     }, 100);
 
     return () => clearInterval(interval);
-  }, [stage]);
+  }, [stage, clicks, clickHistory]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 gap-8">

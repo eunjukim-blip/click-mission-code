@@ -1,15 +1,61 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useMemo } from "react";
 
 const Index = () => {
   const navigate = useNavigate();
+
+  const stats = useMemo(() => {
+    const reactionHistory = localStorage.getItem("reactionHistory");
+    const clickHistory = localStorage.getItem("clickHistory");
+    
+    let avgReaction = null;
+    let avgClicks = null;
+    
+    if (reactionHistory) {
+      const history = JSON.parse(reactionHistory);
+      if (history.length > 0) {
+        const sum = history.reduce((acc: number, time: number) => acc + time, 0);
+        avgReaction = sum / history.length;
+      }
+    }
+    
+    if (clickHistory) {
+      const history = JSON.parse(clickHistory);
+      if (history.length > 0) {
+        const sum = history.reduce((acc: number, clicks: number) => acc + clicks, 0);
+        avgClicks = sum / history.length;
+      }
+    }
+    
+    return { avgReaction, avgClicks };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
       <div className="text-center mb-4 mt-8 animate-in fade-in duration-500">
         <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">게임 센터 🎮</h1>
         <p className="text-xl text-muted-foreground">원하는 게임을 선택하고 리워드를 받으세요!</p>
+        {(stats.avgReaction || stats.avgClicks) && (
+          <div className="mt-4 p-4 bg-card rounded-lg shadow-md max-w-md">
+            <h3 className="text-sm font-semibold text-foreground mb-2">📊 내 게임 통계</h3>
+            <div className="flex gap-4 text-sm text-muted-foreground justify-center">
+              {stats.avgReaction && (
+                <div>
+                  <span className="font-medium">평균 반응속도:</span>{" "}
+                  <span className="text-primary font-bold">{(stats.avgReaction / 1000).toFixed(2)}초</span>
+                </div>
+              )}
+              {stats.avgClicks && (
+                <div>
+                  <span className="font-medium">평균 클릭:</span>{" "}
+                  <span className="text-primary font-bold">{Math.round(stats.avgClicks)}회</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full animate-in fade-in duration-700">
