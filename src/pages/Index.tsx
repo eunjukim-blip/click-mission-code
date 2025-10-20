@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import missionBanner from "@/assets/mission-center-banner.jpg";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -35,7 +36,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
-      <div className="text-center mb-4 mt-8 animate-in fade-in duration-500">
+      <div className="w-full max-w-6xl mb-4 mt-8 animate-in fade-in duration-500">
+        <img 
+          src={missionBanner} 
+          alt="미션 센터 배너" 
+          className="w-full h-auto rounded-2xl shadow-2xl"
+        />
+      </div>
+      
+      <div className="text-center mb-4 animate-in fade-in duration-500">
         <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">미션 센터 🎯</h1>
         <p className="text-xl text-muted-foreground">원하는 미션을 선택하고 리워드를 받으세요!</p>
       </div>
