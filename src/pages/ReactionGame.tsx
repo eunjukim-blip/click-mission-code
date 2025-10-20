@@ -181,7 +181,7 @@ const ReactionGame = () => {
             </p>
           </div>
           <GameCard color={gameColor} onClick={handleTap}>
-            {gameColor === "red" ? "지금!" : "터치!"}
+            {gameColor === "red" ? "지금!" : ""}
           </GameCard>
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
