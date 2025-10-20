@@ -12,15 +12,11 @@ const Index = () => {
   const [stage, setStage] = useState<GameStage>("intro");
   const [clicks, setClicks] = useState(0);
   const [timeLeft, setTimeLeft] = useState(GAME_DURATION);
-  const [balloonScale, setBalloonScale] = useState(1);
-  const [isPopping, setIsPopping] = useState(false);
 
   const startGame = useCallback(() => {
     setStage("playing");
     setClicks(0);
     setTimeLeft(GAME_DURATION);
-    setBalloonScale(1);
-    setIsPopping(false);
   }, []);
 
   const handleBalloonClick = useCallback(() => {
@@ -29,24 +25,11 @@ const Index = () => {
     const newClicks = clicks + 1;
     setClicks(newClicks);
 
-    // Balloon grows with each click
-    const scale = 1 + (newClicks % 10) * 0.15;
-    setBalloonScale(scale);
-
-    // Pop animation every 10 clicks
-    if (newClicks % 10 === 0) {
-      setIsPopping(true);
-      setTimeout(() => {
-        setIsPopping(false);
-        setBalloonScale(1);
-      }, 300);
-    }
-
     // Check win condition
     if (newClicks >= TARGET_CLICKS) {
       setStage("result");
-      toast.success("성공! 🎉", {
-        description: `${TARGET_CLICKS}개 달성!`,
+      toast.success("성공! 💎", {
+        description: `보석을 찾았어요!`,
       });
     }
   }, [stage, clicks]);
@@ -55,8 +38,6 @@ const Index = () => {
     setStage("intro");
     setClicks(0);
     setTimeLeft(GAME_DURATION);
-    setBalloonScale(1);
-    setIsPopping(false);
   }, []);
 
   const handleRewardClick = useCallback(() => {
@@ -141,43 +122,67 @@ const Index = () => {
 
           <div 
             onClick={handleBalloonClick}
-            className="relative flex items-center justify-center cursor-pointer select-none mt-8"
+            className="relative flex items-center justify-center cursor-pointer select-none mt-8 w-48 h-48"
           >
-            {!isPopping ? (
-              <div className="relative">
-                <div 
-                  className="w-40 h-40 bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 rounded-lg rotate-45 shadow-2xl transition-all duration-200 hover:scale-110 active:scale-95"
-                  style={{ 
-                    transform: `rotate(45deg) scale(${balloonScale})`,
-                  }}
-                >
-                  {/* 균열 효과 */}
-                  {clicks % 10 > 3 && (
-                    <div className="absolute inset-0 overflow-hidden rounded-lg">
-                      <div className="absolute top-0 left-1/2 w-0.5 h-full bg-black/40 rotate-12"></div>
-                      <div className="absolute top-1/2 left-0 w-full h-0.5 bg-black/40 -rotate-12"></div>
-                    </div>
-                  )}
-                  {clicks % 10 > 6 && (
-                    <div className="absolute inset-0 overflow-hidden rounded-lg">
-                      <div className="absolute top-0 right-1/4 w-0.5 h-full bg-black/40 -rotate-12"></div>
-                      <div className="absolute top-1/4 left-0 w-full h-0.5 bg-black/40 rotate-12"></div>
-                    </div>
-                  )}
-                  <div className="absolute inset-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-sm"></div>
-                </div>
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl pointer-events-none">⛏️</div>
+            {clicks >= TARGET_CLICKS ? (
+              // 보석 등장!
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-8xl animate-bounce">💎</div>
+                <div className="absolute text-6xl animate-ping">✨</div>
               </div>
             ) : (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-8xl animate-ping">💎</div>
-                <div className="absolute text-6xl">✨</div>
+              <div className="relative">
+                {/* 돌 */}
+                <div 
+                  className="w-40 h-40 bg-gradient-to-br from-gray-500 via-gray-600 to-gray-700 rounded-lg rotate-45 shadow-2xl transition-all duration-200 hover:scale-105 active:scale-95"
+                >
+                  {/* 균열 효과 - 진행도에 따라 */}
+                  <div className="absolute inset-0 overflow-hidden rounded-lg">
+                    {/* 0-50: 초반 균열 */}
+                    {clicks > 10 && (
+                      <>
+                        <div className="absolute top-0 left-1/2 w-0.5 h-full bg-black/50"></div>
+                        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-black/50"></div>
+                      </>
+                    )}
+                    {/* 50: 반 정도 깨짐 */}
+                    {clicks >= 50 && (
+                      <>
+                        <div className="absolute top-0 left-1/3 w-0.5 h-full bg-black/60 rotate-12"></div>
+                        <div className="absolute top-0 right-1/3 w-0.5 h-full bg-black/60 -rotate-12"></div>
+                        <div className="absolute top-1/3 left-0 w-full h-0.5 bg-black/60"></div>
+                        <div className="absolute inset-2 bg-black/10 rounded"></div>
+                      </>
+                    )}
+                    {/* 100: 80% 깨짐 */}
+                    {clicks >= 100 && (
+                      <>
+                        <div className="absolute top-0 left-1/4 w-1 h-full bg-black/70 rotate-6"></div>
+                        <div className="absolute top-0 right-1/4 w-1 h-full bg-black/70 -rotate-6"></div>
+                        <div className="absolute top-1/4 left-0 w-full h-1 bg-black/70 rotate-3"></div>
+                        <div className="absolute bottom-1/4 left-0 w-full h-1 bg-black/70 -rotate-3"></div>
+                        <div className="absolute inset-3 bg-black/20 rounded"></div>
+                        {/* 보석 힌트 */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl opacity-50">💎</div>
+                      </>
+                    )}
+                  </div>
+                  <div className="absolute inset-4 bg-gradient-to-br from-gray-400 to-gray-500 rounded-sm"></div>
+                </div>
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl pointer-events-none animate-bounce">⛏️</div>
               </div>
             )}
           </div>
           
           <p className="text-muted-foreground text-center">
-            돌을 빠르게 캐세요! 보석이 나올 거예요!
+            {clicks < 50 
+              ? "돌을 계속 캐보세요!" 
+              : clicks < 100 
+              ? "반쯤 왔어요! 계속!" 
+              : clicks < TARGET_CLICKS
+              ? "거의 다 왔어요! 조금만 더!"
+              : "보석 발견! 🎉"
+            }
           </p>
         </div>
       )}
