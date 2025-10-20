@@ -19,13 +19,6 @@ const characterMap = {
   gray: characterGray,
 };
 
-const colorClassMap = {
-  blue: "bg-game-blue",
-  red: "bg-game-red",
-  green: "bg-game-green",
-  gray: "bg-game-gray",
-};
-
 export const GameCard = ({ color, onClick, children }: GameCardProps) => {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -41,20 +34,21 @@ export const GameCard = ({ color, onClick, children }: GameCardProps) => {
     <div
       onClick={onClick}
       className={`
-        relative w-64 h-64 rounded-3xl shadow-2xl transition-all duration-300
-        flex flex-col items-center justify-center gap-4 p-6
-        ${colorClassMap[color]}
-        ${onClick ? "cursor-pointer hover:scale-105 active:scale-95" : ""}
+        relative flex flex-col items-center justify-center gap-4
+        transition-all duration-300
+        ${onClick ? "cursor-pointer hover:scale-110 active:scale-95" : ""}
         ${isAnimating ? "animate-wiggle" : ""}
       `}
     >
       <img
         src={characterMap[color]}
         alt={`${color} character`}
-        className={`w-32 h-32 object-contain ${color === "blue" ? "animate-bounce" : ""}`}
+        className={`w-64 h-64 object-contain drop-shadow-2xl ${
+          color === "blue" ? "animate-bounce" : ""
+        }`}
       />
       {children && (
-        <div className="text-white font-bold text-lg text-center">
+        <div className="text-foreground font-bold text-2xl text-center bg-white/90 px-6 py-3 rounded-full shadow-lg">
           {children}
         </div>
       )}

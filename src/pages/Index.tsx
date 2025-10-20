@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { GameCard3D } from "@/components/GameCard3D";
+import { GameCard } from "@/components/GameCard";
 
 type GameStage = "intro" | "waiting" | "ready" | "result";
 type GameColor = "blue" | "red" | "green" | "gray";
@@ -84,7 +84,7 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-4">
             여우로 바뀔 때만 터치하세요!
           </p>
-          <GameCard3D color="blue">준비하세요!</GameCard3D>
+          <GameCard color="blue">준비하세요!</GameCard>
           <Button
             onClick={startGame}
             size="lg"
@@ -101,9 +101,9 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-foreground">
             {stage === "waiting" ? "기다려요..." : "지금 터치!"}
           </h2>
-          <GameCard3D color={gameColor} onClick={handleTap}>
+          <GameCard color={gameColor} onClick={handleTap}>
             {stage === "waiting" ? "터치!" : "지금!"}
-          </GameCard3D>
+          </GameCard>
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
       )}
@@ -112,7 +112,7 @@ const Index = () => {
       {stage === "result" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
           <h2 className="text-3xl font-bold text-foreground">결과</h2>
-          <GameCard3D color={gameColor}>{resultMessage}</GameCard3D>
+          <GameCard color={gameColor}>{resultMessage}</GameCard>
           <div className="flex flex-col gap-3">
             <Button
               onClick={retry}
