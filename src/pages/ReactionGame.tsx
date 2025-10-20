@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { GameCard } from "@/components/GameCard";
 import { toast } from "sonner";
@@ -15,6 +15,16 @@ const ReactionGame = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [reactionTime, setReactionTime] = useState<number | null>(null);
   const [resultMessage, setResultMessage] = useState("");
+  const [reactionHistory, setReactionHistory] = useState<number[]>(() => {
+    const saved = localStorage.getItem("reactionHistory");
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const averageReactionTime = useMemo(() => {
+    if (reactionHistory.length === 0) return null;
+    const sum = reactionHistory.reduce((acc, time) => acc + time, 0);
+    return sum / reactionHistory.length;
+  }, [reactionHistory]);
 
   const startGame = useCallback(() => {
     setStage("waiting");
@@ -45,6 +55,12 @@ const ReactionGame = () => {
       setReactionTime(time);
       setStage("result");
       setGameColor("red");
+      
+      // 성공한 경우만 히스토리에 저장
+      const newHistory = [...reactionHistory, time];
+      setReactionHistory(newHistory);
+      localStorage.setItem("reactionHistory", JSON.stringify(newHistory));
+      
       const timeInSeconds = (time / 1000).toFixed(2);
       if (time <= 150) {
         setResultMessage(`${timeInSeconds}초 - 리워드를 받을 수 있어요! 🎁`);
@@ -52,7 +68,7 @@ const ReactionGame = () => {
         setResultMessage(`반응속도: ${timeInSeconds}초 🎯`);
       }
     }
-  }, [stage, startTime]);
+  }, [stage, startTime, reactionHistory]);
 
   const retry = useCallback(() => {
     setStage("intro");
@@ -188,17 +204,24 @@ const ReactionGame = () => {
               🏠 미니게임 홈으로
             </Button>
             {reactionTime !== null && (
-              <p className="text-center text-muted-foreground text-sm">
-                {reactionTime <= 150
-                  ? "🏆 최고의 반응속도! 리워드 획득!"
-                  : reactionTime < 200
-                  ? "조금만 더 빨리! (리워드는 0.15초 이하)"
-                  : reactionTime < 300
-                  ? "훌륭해요! 👏"
-                  : reactionTime < 500
-                  ? "잘했어요! 😊"
-                  : "다음엔 더 빠르게! 💪"}
-              </p>
+              <>
+                <p className="text-center text-muted-foreground text-sm">
+                  {reactionTime <= 150
+                    ? "🏆 최고의 반응속도! 리워드 획득!"
+                    : reactionTime < 200
+                    ? "조금만 더 빨리! (리워드는 0.15초 이하)"
+                    : reactionTime < 300
+                    ? "훌륭해요! 👏"
+                    : reactionTime < 500
+                    ? "잘했어요! 😊"
+                    : "다음엔 더 빠르게! 💪"}
+                </p>
+                {averageReactionTime && (
+                  <p className="text-center text-muted-foreground text-sm mt-2">
+                    대체로 평균으로 {(averageReactionTime / 1000).toFixed(2)}초를 하고있어요
+                  </p>
+                )}
+              </>
             )}
           </div>
         </div>
