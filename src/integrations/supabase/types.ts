@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      gem_game_results: {
+        Row: {
+          clicks: number
+          created_at: string | null
+          id: string
+          success: boolean
+        }
+        Insert: {
+          clicks: number
+          created_at?: string | null
+          id?: string
+          success: boolean
+        }
+        Update: {
+          clicks?: number
+          created_at?: string | null
+          id?: string
+          success?: boolean
+        }
+        Relationships: []
+      }
+      reaction_game_results: {
+        Row: {
+          created_at: string | null
+          id: string
+          reaction_time: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          reaction_time: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          reaction_time?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

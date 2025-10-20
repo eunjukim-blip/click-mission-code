@@ -4,6 +4,7 @@ import { GameCard } from "@/components/GameCard";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 type GameStage = "intro" | "waiting" | "ready" | "result";
 type GameColor = "blue" | "red" | "green" | "gray";
@@ -56,7 +57,15 @@ const ReactionGame = () => {
       setStage("result");
       setGameColor("red");
       
-      // 성공한 경우만 히스토리에 저장
+      // 데이터베이스에 저장
+      supabase
+        .from('reaction_game_results')
+        .insert({ reaction_time: time })
+        .then(({ error }) => {
+          if (error) console.error('Failed to save result:', error);
+        });
+      
+      // 로컬 히스토리에도 저장
       const newHistory = [...reactionHistory, time];
       setReactionHistory(newHistory);
       localStorage.setItem("reactionHistory", JSON.stringify(newHistory));

@@ -4,6 +4,7 @@ import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 type GameStage = "intro" | "playing" | "result";
 
@@ -68,13 +69,23 @@ const GemGame = () => {
       setTimeLeft((prev) => {
         if (prev <= 0.1) {
           setStage("result");
-          // 게임 종료 시 클릭 수 저장
+          const success = clicks >= TARGET_CLICKS;
+          
+          // 데이터베이스에 저장
+          supabase
+            .from('gem_game_results')
+            .insert({ clicks, success })
+            .then(({ error }) => {
+              if (error) console.error('Failed to save result:', error);
+            });
+          
+          // 로컬 히스토리에도 저장
           const newHistory = [...clickHistory, clicks];
           setClickHistory(newHistory);
           localStorage.setItem("clickHistory", JSON.stringify(newHistory));
           
           // 실패시 진동
-          if (clicks < TARGET_CLICKS && 'vibrate' in navigator) {
+          if (!success && 'vibrate' in navigator) {
             navigator.vibrate([200, 100, 200]);
           }
           return 0;

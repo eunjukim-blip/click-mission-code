@@ -1,35 +1,36 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useMemo } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const navigate = useNavigate();
+  const [avgReactionTime, setAvgReactionTime] = useState<number | null>(null);
+  const [avgClicks, setAvgClicks] = useState<number | null>(null);
 
-  const stats = useMemo(() => {
-    const reactionHistory = localStorage.getItem("reactionHistory");
-    const clickHistory = localStorage.getItem("clickHistory");
-    
-    let avgReaction = null;
-    let avgClicks = null;
-    
-    if (reactionHistory) {
-      const history = JSON.parse(reactionHistory);
-      if (history.length > 0) {
-        const sum = history.reduce((acc: number, time: number) => acc + time, 0);
-        avgReaction = sum / history.length;
-      }
-    }
-    
-    if (clickHistory) {
-      const history = JSON.parse(clickHistory);
-      if (history.length > 0) {
-        const sum = history.reduce((acc: number, clicks: number) => acc + clicks, 0);
-        avgClicks = sum / history.length;
-      }
-    }
-    
-    return { avgReaction, avgClicks };
+  useEffect(() => {
+    // 반응속도 평균 가져오기
+    supabase
+      .from('reaction_game_results')
+      .select('reaction_time')
+      .then(({ data, error }) => {
+        if (!error && data && data.length > 0) {
+          const sum = data.reduce((acc, row) => acc + row.reaction_time, 0);
+          setAvgReactionTime(sum / data.length);
+        }
+      });
+
+    // 클릭 평균 가져오기
+    supabase
+      .from('gem_game_results')
+      .select('clicks')
+      .then(({ data, error }) => {
+        if (!error && data && data.length > 0) {
+          const sum = data.reduce((acc, row) => acc + row.clicks, 0);
+          setAvgClicks(sum / data.length);
+        }
+      });
   }, []);
 
   return (
@@ -37,25 +38,6 @@ const Index = () => {
       <div className="text-center mb-4 mt-8 animate-in fade-in duration-500">
         <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">게임 센터 🎮</h1>
         <p className="text-xl text-muted-foreground">원하는 게임을 선택하고 리워드를 받으세요!</p>
-        {(stats.avgReaction || stats.avgClicks) && (
-          <div className="mt-4 p-4 bg-card rounded-lg shadow-md max-w-md">
-            <h3 className="text-sm font-semibold text-foreground mb-2">📊 내 게임 통계</h3>
-            <div className="flex gap-4 text-sm text-muted-foreground justify-center">
-              {stats.avgReaction && (
-                <div>
-                  <span className="font-medium">평균 반응속도:</span>{" "}
-                  <span className="text-primary font-bold">{(stats.avgReaction / 1000).toFixed(2)}초</span>
-                </div>
-              )}
-              {stats.avgClicks && (
-                <div>
-                  <span className="font-medium">평균 클릭:</span>{" "}
-                  <span className="text-primary font-bold">{Math.round(stats.avgClicks)}회</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl w-full animate-in fade-in duration-700">
@@ -72,6 +54,11 @@ const Index = () => {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>⚡ 반응속도가 0.15초 보다 빠르면 리워드 적립!</p>
               <p>🎯 반응속도 측정</p>
+              {avgReactionTime && (
+                <p className="text-primary font-semibold pt-2 border-t">
+                  📊 전체 평균: {(avgReactionTime / 1000).toFixed(2)}초
+                </p>
+              )}
             </div>
             <Button className="w-full mt-4" size="lg">
               플레이하기 →
@@ -92,6 +79,11 @@ const Index = () => {
             <div className="space-y-2 text-sm text-muted-foreground">
               <p>⏱️ 20초 시간 제한</p>
               <p>🎯 120번 클릭 하면 보석획득!</p>
+              {avgClicks && (
+                <p className="text-primary font-semibold pt-2 border-t">
+                  📊 전체 평균: {Math.round(avgClicks)}회 클릭
+                </p>
+              )}
             </div>
             <Button className="w-full mt-4" size="lg">
               플레이하기 →
