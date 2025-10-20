@@ -174,13 +174,15 @@ const ReactionGame = () => {
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-300">
           <div className="text-center">
             <h2 className="text-3xl font-bold text-foreground mb-2">
-              {stage === "waiting" ? "기다려요..." : "지금 터치!"}
+              {stage === "waiting" ? "기다려요..." : ""}
             </h2>
             <p className="text-lg text-muted-foreground">
               캐릭터가 여우로 바뀔 때 터치하세요
             </p>
           </div>
-          <GameCard color={gameColor} onClick={handleTap} />
+          <GameCard color={gameColor} onClick={handleTap}>
+            {gameColor === "red" ? "터치" : ""}
+          </GameCard>
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
       )}
