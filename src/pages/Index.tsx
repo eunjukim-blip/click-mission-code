@@ -41,8 +41,13 @@ const Index = () => {
       const time = Date.now() - startTime;
       setReactionTime(time);
       setStage("result");
-      setGameColor("green");
-      setResultMessage(`반응속도: ${(time / 1000).toFixed(2)}초 🎯`);
+      setGameColor("red");
+      const timeInSeconds = (time / 1000).toFixed(2);
+      if (time <= 1250) {
+        setResultMessage(`${timeInSeconds}초 - 리워드를 받을 수 있어요! 🎁`);
+      } else {
+        setResultMessage(`반응속도: ${timeInSeconds}초 🎯`);
+      }
     }
   }, [stage, startTime]);
 
@@ -123,7 +128,9 @@ const Index = () => {
             </Button>
             {reactionTime !== null && (
               <p className="text-center text-muted-foreground text-sm">
-                {reactionTime < 200
+                {reactionTime <= 1250
+                  ? "🏆 최고의 반응속도!"
+                  : reactionTime < 200
                   ? "놀라운 반응속도! 🏆"
                   : reactionTime < 300
                   ? "훌륭해요! 👏"
