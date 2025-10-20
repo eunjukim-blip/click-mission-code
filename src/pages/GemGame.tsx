@@ -123,7 +123,7 @@ const GemGame = () => {
                 ⏱️ {timeLeft.toFixed(1)}초
               </div>
               <div className="text-2xl font-bold text-primary">
-                🎈 {clicks}/{TARGET_CLICKS}
+                {clicks}/{TARGET_CLICKS}
               </div>
             </div>
             <Progress value={(clicks / TARGET_CLICKS) * 100} className="h-3" />
