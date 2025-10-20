@@ -129,11 +129,11 @@ const ReactionGame = () => {
   }, [stage, startGame, handleTap, retry]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 gap-8">
+    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pt-20 gap-8">
       <Button
         onClick={() => navigate("/")}
         variant="ghost"
-        className="fixed top-4 left-4"
+        className="fixed top-4 left-4 z-50"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />
         메뉴로
@@ -150,7 +150,7 @@ const ReactionGame = () => {
               여우로 바뀔 때만 터치하세요!
             </p>
             <p className="text-lg text-primary font-semibold">
-              ⚡ 반응속도가 0.15초보다 빠르면 리워드를 받을 수 있어요!
+              ⚡ 0.15초 보다 빠르면 리워드 적립!
             </p>
           </div>
           <GameCard color="blue">준비하세요!</GameCard>
