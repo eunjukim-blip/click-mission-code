@@ -99,16 +99,21 @@ const fortunePatterns = [
   }
 ];
 
-// 연도와 날짜를 기반으로 운세 인덱스 생성 (같은 연도 + 같은 날짜는 항상 같은 운세)
-const getFortuneForYear = (year: number) => {
+// 띠, 연도, 날짜를 모두 조합해서 매일/띠별/연도별로 다른 운세 생성
+const getFortuneForYear = (zodiac: Zodiac, year: number) => {
   const today = new Date();
   const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 1000 / 60 / 60 / 24);
-  // 연도와 일자를 조합하여 인덱스 생성
-  const combinedValue = year + dayOfYear;
-  const index = combinedValue % fortunePatterns.length;
+  
+  // 띠별 고유값
+  const zodiacValue = zodiacBaseYears[zodiac];
+  
+  // 띠 + 연도 + 날짜를 조합하여 고유한 인덱스 생성
+  const combinedValue = (zodiacValue * 1000) + year + (dayOfYear * 17);
+  const index = Math.abs(combinedValue) % fortunePatterns.length;
   const fortune = fortunePatterns[index];
-  // 연도와 날짜 기반으로 행운의 숫자도 다르게
-  const luckyNumber = ((year * 7 + dayOfYear * 3) % 12) + 1;
+  
+  // 띠, 연도, 날짜 기반으로 행운의 숫자도 매번 다르게
+  const luckyNumber = ((zodiacValue * 5 + year * 7 + dayOfYear * 3) % 12) + 1;
   return { ...fortune, luckyNumber };
 };
 
@@ -246,25 +251,25 @@ const FortuneGame = () => {
                     오늘의 운세
                   </h3>
                   <p className="text-base leading-relaxed text-foreground">
-                    {getFortuneForYear(selectedYear).summary}
+                    {getFortuneForYear(selectedZodiac, selectedYear).summary}
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-white/70 rounded-lg p-4 shadow-sm">
                     <h3 className="text-base font-bold text-orange-600 mb-2">운세 점수</h3>
-                    <p className="text-3xl font-black text-orange-700">{getFortuneForYear(selectedYear).score} / 100</p>
+                    <p className="text-3xl font-black text-orange-700">{getFortuneForYear(selectedZodiac, selectedYear).score} / 100</p>
                   </div>
 
                   <div className="bg-white/70 rounded-lg p-4 shadow-sm">
                     <h3 className="text-base font-bold text-orange-600 mb-2">행운의 숫자</h3>
-                    <p className="text-3xl font-black text-orange-700">{getFortuneForYear(selectedYear).luckyNumber}</p>
+                    <p className="text-3xl font-black text-orange-700">{getFortuneForYear(selectedZodiac, selectedYear).luckyNumber}</p>
                   </div>
                 </div>
 
                 <div className="bg-white/70 rounded-lg p-4 shadow-sm">
                   <h3 className="text-base font-bold text-orange-600 mb-2">행운의 컬러</h3>
-                  <p className="text-xl font-bold text-orange-700">{getFortuneForYear(selectedYear).luckyColor}</p>
+                  <p className="text-xl font-bold text-orange-700">{getFortuneForYear(selectedZodiac, selectedYear).luckyColor}</p>
                 </div>
               </div>
 
