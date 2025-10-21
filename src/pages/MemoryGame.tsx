@@ -42,10 +42,24 @@ const MemoryGame = () => {
   const [startTime, setStartTime] = useState<number | null>(null);
   const [isChecking, setIsChecking] = useState(false);
   const [gameStarted, setGameStarted] = useState(false);
+  const [currentRound, setCurrentRound] = useState(1);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [roundComplete, setRoundComplete] = useState(false);
+  const [gameOver, setGameOver] = useState(false);
 
-  const initializeGame = useCallback(() => {
-    const colors: CardColor[] = ["blue", "red", "green", "gray", "yellow", "pink", "orange", "purple"];
-    const shuffled = [...colors, ...colors]
+  const roundConfigs = [
+    { round: 1, pairs: 2, gridCols: 2 }, // 4개 카드
+    { round: 2, pairs: 4, gridCols: 4 }, // 8개 카드
+    { round: 3, pairs: 8, gridCols: 4 }, // 16개 카드
+  ];
+
+  const currentConfig = roundConfigs[currentRound - 1];
+
+  const initializeRound = useCallback((round: number) => {
+    const config = roundConfigs[round - 1];
+    const allColors: CardColor[] = ["blue", "red", "green", "gray", "yellow", "pink", "orange", "purple"];
+    const selectedColors = allColors.slice(0, config.pairs);
+    const shuffled = [...selectedColors, ...selectedColors]
       .sort(() => Math.random() - 0.5)
       .map((color, index) => ({
         id: index,
@@ -56,24 +70,48 @@ const MemoryGame = () => {
     
     setCards(shuffled);
     setFlippedCards([]);
-    setAttempts(0);
     setMatchedPairs(0);
-    setStartTime(null);
+    setStartTime(Date.now());
     setIsChecking(false);
-    setGameStarted(false);
+    setGameStarted(true);
+    setTimeLeft(30);
+    setRoundComplete(false);
   }, []);
 
+  const resetGame = useCallback(() => {
+    setCurrentRound(1);
+    setAttempts(0);
+    setGameOver(false);
+    initializeRound(1);
+  }, [initializeRound]);
+
   useEffect(() => {
-    initializeGame();
-  }, [initializeGame]);
+    initializeRound(1);
+  }, [initializeRound]);
+
+  // 타이머 관리
+  useEffect(() => {
+    if (!gameStarted || roundComplete || gameOver) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
+          setGameOver(true);
+          toast.error("⏰ 시간 초과! 게임 오버");
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [gameStarted, roundComplete, gameOver]);
 
   const handleCardClick = useCallback((cardId: number) => {
-    if (!gameStarted) {
-      setGameStarted(true);
-      setStartTime(Date.now());
-    }
-
-    if (isChecking || flippedCards.length >= 2) return;
+    if (isChecking || flippedCards.length >= 2 || roundComplete || gameOver) return;
+    
+    // CPC 광고 플레이스홀더 (실제 광고 SDK 연동 필요)
+    console.log("CPC 광고 노출 기회");
     
     const card = cards.find(c => c.id === cardId);
     if (!card || card.isFlipped || card.isMatched) return;
@@ -94,7 +132,6 @@ const MemoryGame = () => {
       const secondCard = cards.find(c => c.id === secondId);
 
       if (firstCard?.color === secondCard?.color) {
-        // 매칭 성공
         setTimeout(() => {
           setCards(prev => prev.map(c => 
             c.id === firstId || c.id === secondId ? { ...c, isMatched: true } : c
@@ -104,7 +141,6 @@ const MemoryGame = () => {
           setIsChecking(false);
         }, 500);
       } else {
-        // 매칭 실패
         setTimeout(() => {
           setCards(prev => prev.map(c => 
             c.id === firstId || c.id === secondId ? { ...c, isFlipped: false } : c
@@ -114,32 +150,48 @@ const MemoryGame = () => {
         }, 1000);
       }
     }
-  }, [cards, flippedCards, isChecking, gameStarted]);
+  }, [cards, flippedCards, isChecking, roundComplete, gameOver]);
 
+  // 라운드 완료 체크
   useEffect(() => {
-    if (matchedPairs === 8 && startTime) {
-      const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-      const success = attempts <= 15;
-
-      // 데이터베이스에 저장
-      supabase
-        .from("memory_game_results")
-        .insert({
-          attempts,
-          time_taken: timeTaken,
-          success,
-        })
-        .then(() => {
-          if (success) {
-            localStorage.setItem("memoryRewardDate", new Date().toDateString());
-            toast.success("🎁 리워드 적립 완료!");
-          }
-        });
+    if (matchedPairs === currentConfig.pairs && !roundComplete && !gameOver) {
+      setRoundComplete(true);
+      
+      if (currentRound === 3) {
+        // 최종 라운드 완료
+        const success = attempts <= 15;
+        supabase
+          .from("memory_game_results")
+          .insert({
+            attempts,
+            time_taken: 30 - timeLeft,
+            success,
+          })
+          .then(() => {
+            if (success) {
+              localStorage.setItem("memoryRewardDate", new Date().toDateString());
+              toast.success("🎉 전체 게임 완료! 리워드 적립!");
+            } else {
+              toast.success("🎉 전체 게임 완료!");
+            }
+          });
+      } else {
+        toast.success(`🎉 라운드 ${currentRound} 완료!`);
+      }
     }
-  }, [matchedPairs, attempts, startTime]);
+  }, [matchedPairs, currentConfig.pairs, roundComplete, gameOver, currentRound, attempts, timeLeft]);
 
-  const isGameComplete = matchedPairs === 8;
-  const gotReward = attempts <= 15 && isGameComplete;
+  const handleNextRound = () => {
+    // RV 광고 플레이스홀더 (실제 광고 SDK 연동 필요)
+    console.log("RV 광고 재생 필요");
+    toast.info("광고 시청 후 다음 라운드로 진행됩니다");
+    
+    // 광고 시청 시뮬레이션 후 다음 라운드로
+    setTimeout(() => {
+      setCurrentRound(prev => prev + 1);
+      initializeRound(currentRound + 1);
+    }, 1000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 p-6">
@@ -158,19 +210,22 @@ const MemoryGame = () => {
             🧠 기억력 게임
           </h1>
           <p className="text-lg text-muted-foreground mb-4">
-            같은 색상의 카드를 찾아보세요!
+            라운드 {currentRound}/3 - 같은 캐릭터를 찾아보세요!
           </p>
           <div className="flex justify-center gap-6 text-lg">
             <span className="font-semibold">시도: {attempts}회</span>
-            <span className="font-semibold">매칭: {matchedPairs}/8</span>
+            <span className="font-semibold">매칭: {matchedPairs}/{currentConfig.pairs}</span>
+            <span className={`font-semibold ${timeLeft <= 10 ? 'text-destructive animate-pulse' : ''}`}>
+              ⏱️ {timeLeft}초
+            </span>
           </div>
           <p className="text-sm text-primary font-semibold mt-2">
-            ⚡ 15회 이하 시도로 완료하면 리워드 적립!
+            ⚡ 30초 안에 완료하세요! (전체 15회 이하로 완료하면 리워드!)
           </p>
         </div>
 
-        {!isGameComplete ? (
-          <div className="grid grid-cols-4 gap-4 max-w-2xl mx-auto">
+        {!gameOver && !roundComplete ? (
+          <div className={`grid gap-4 max-w-2xl mx-auto`} style={{ gridTemplateColumns: `repeat(${currentConfig.gridCols}, minmax(0, 1fr))` }}>
             {cards.map((card) => (
               <div
                 key={card.id}
@@ -195,19 +250,45 @@ const MemoryGame = () => {
               </div>
             ))}
           </div>
+        ) : roundComplete && currentRound < 3 ? (
+          <div className="text-center space-y-6">
+            <div className="text-6xl mb-4">🎉</div>
+            <h2 className="text-3xl font-bold text-foreground">
+              라운드 {currentRound} 완료!
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              다음 라운드로 진행하시겠습니까?
+            </p>
+            <Button onClick={handleNextRound} size="lg">
+              광고 보고 다음 라운드 시작
+            </Button>
+          </div>
+        ) : gameOver ? (
+          <div className="text-center space-y-6">
+            <div className="text-6xl mb-4">😢</div>
+            <h2 className="text-3xl font-bold text-foreground">
+              게임 오버
+            </h2>
+            <p className="text-xl text-muted-foreground">
+              시간 내에 완료하지 못했습니다
+            </p>
+            <Button onClick={resetGame} size="lg">
+              다시 시작
+            </Button>
+          </div>
         ) : (
           <div className="text-center space-y-6">
             <div className="text-6xl mb-4">
-              {gotReward ? "🎉" : "✨"}
+              {attempts <= 15 ? "🎉" : "✨"}
             </div>
             <h2 className="text-3xl font-bold text-foreground">
-              게임 완료!
+              전체 게임 완료!
             </h2>
             <div className="space-y-2">
               <p className="text-xl text-muted-foreground">
                 총 {attempts}회 시도
               </p>
-              {gotReward ? (
+              {attempts <= 15 ? (
                 <p className="text-xl text-primary font-bold">
                   🎁 리워드 적립 완료!
                 </p>
@@ -218,7 +299,7 @@ const MemoryGame = () => {
               )}
             </div>
             <div className="flex gap-4 justify-center">
-              <Button onClick={initializeGame} size="lg">
+              <Button onClick={resetGame} size="lg">
                 다시 하기
               </Button>
               <Button onClick={() => navigate("/")} variant="outline" size="lg">
