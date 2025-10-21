@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import blueCharacter from "@/assets/character-blue.png";
+import redCharacter from "@/assets/character-red.png";
+import greenCharacter from "@/assets/character-green.png";
+import grayCharacter from "@/assets/character-gray.png";
 
 type CardColor = "blue" | "red" | "green" | "gray";
 
@@ -14,11 +18,11 @@ interface Card {
   isMatched: boolean;
 }
 
-const colorMap = {
-  blue: "bg-game-blue",
-  red: "bg-game-red",
-  green: "bg-game-green",
-  gray: "bg-game-gray",
+const characterMap = {
+  blue: blueCharacter,
+  red: redCharacter,
+  green: greenCharacter,
+  gray: grayCharacter,
 };
 
 const MemoryGame = () => {
@@ -166,13 +170,21 @@ const MemoryGame = () => {
                 className={`
                   aspect-square rounded-xl cursor-pointer transition-all duration-300
                   ${card.isFlipped || card.isMatched 
-                    ? `${colorMap[card.color]} scale-100` 
+                    ? 'bg-white dark:bg-gray-800 scale-100' 
                     : 'bg-gray-300 dark:bg-gray-700 hover:scale-105'
                   }
                   ${card.isMatched ? 'opacity-60' : ''}
-                  shadow-lg
+                  shadow-lg overflow-hidden flex items-center justify-center p-2
                 `}
-              />
+              >
+                {(card.isFlipped || card.isMatched) && (
+                  <img 
+                    src={characterMap[card.color]} 
+                    alt={card.color}
+                    className="w-full h-full object-contain"
+                  />
+                )}
+              </div>
             ))}
           </div>
         ) : (
