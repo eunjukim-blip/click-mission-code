@@ -48,9 +48,9 @@ const MemoryGame = () => {
   const [gameOver, setGameOver] = useState(false);
 
   const roundConfigs = [
-    { round: 1, pairs: 2, gridCols: 2 }, // 4개 카드
-    { round: 2, pairs: 4, gridCols: 4 }, // 8개 카드
-    { round: 3, pairs: 8, gridCols: 4 }, // 16개 카드
+    { round: 1, pairs: 2, gridCols: 2, time: 10 }, // 4개 카드, 10초
+    { round: 2, pairs: 4, gridCols: 4, time: 20 }, // 8개 카드, 20초
+    { round: 3, pairs: 8, gridCols: 4, time: 25 }, // 16개 카드, 25초
   ];
 
   const currentConfig = roundConfigs[currentRound - 1];
@@ -74,7 +74,7 @@ const MemoryGame = () => {
     setStartTime(Date.now());
     setIsChecking(false);
     setGameStarted(true);
-    setTimeLeft(30);
+    setTimeLeft(config.time);
     setRoundComplete(false);
   }, []);
 
@@ -164,7 +164,7 @@ const MemoryGame = () => {
           .from("memory_game_results")
           .insert({
             attempts,
-            time_taken: 30 - timeLeft,
+            time_taken: currentConfig.time - timeLeft,
             success,
           })
           .then(() => {
@@ -220,7 +220,7 @@ const MemoryGame = () => {
             </span>
           </div>
           <p className="text-sm text-primary font-semibold mt-2">
-            ⚡ 30초 안에 완료하세요! (전체 15회 이하로 완료하면 리워드!)
+            ⚡ {currentConfig.time}초 안에 완료하세요! (전체 15회 이하로 완료하면 리워드!)
           </p>
         </div>
 
