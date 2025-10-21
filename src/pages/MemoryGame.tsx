@@ -169,7 +169,6 @@ const MemoryGame = () => {
           })
           .then(() => {
             if (success) {
-              localStorage.setItem("memoryRewardDate", new Date().toDateString());
               toast.success("🎉 전체 게임 완료! 리워드 적립!");
             } else {
               toast.success("🎉 전체 게임 완료!");
