@@ -35,6 +35,30 @@ export type Database = {
         }
         Relationships: []
       }
+      memory_game_results: {
+        Row: {
+          attempts: number
+          created_at: string | null
+          id: string
+          success: boolean
+          time_taken: number
+        }
+        Insert: {
+          attempts: number
+          created_at?: string | null
+          id?: string
+          success: boolean
+          time_taken: number
+        }
+        Update: {
+          attempts?: number
+          created_at?: string | null
+          id?: string
+          success?: boolean
+          time_taken?: number
+        }
+        Relationships: []
+      }
       reaction_game_results: {
         Row: {
           created_at: string | null

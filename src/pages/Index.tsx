@@ -14,6 +14,7 @@ const Index = () => {
   const [reactionCompleted, setReactionCompleted] = useState(false);
   const [gemCompleted, setGemCompleted] = useState(false);
   const [fortuneCompleted, setFortuneCompleted] = useState(false);
+  const [memoryCompleted, setMemoryCompleted] = useState(false);
 
   useEffect(() => {
     // 반응속도 평균 가져오기
@@ -43,6 +44,7 @@ const Index = () => {
     setReactionCompleted(localStorage.getItem("reactionRewardDate") === today);
     setGemCompleted(localStorage.getItem("gemRewardDate") === today);
     setFortuneCompleted(localStorage.getItem("fortuneRewardDate") === today);
+    setMemoryCompleted(localStorage.getItem("memoryRewardDate") === today);
   }, []);
 
   const handleCompletedClick = (gameName: string) => {
@@ -150,6 +152,32 @@ const Index = () => {
             </div>
             <Button className="w-full mt-4" size="lg" disabled={fortuneCompleted}>
               {fortuneCompleted ? "오늘 완료 ✓" : "운세 보기 →"}
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
+          onClick={() => memoryCompleted ? handleCompletedClick("기억력 게임") : navigate("/memory")}
+        >
+          {memoryCompleted && (
+            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
+              적립완료
+            </Badge>
+          )}
+          <CardHeader>
+            <div className="text-6xl mb-4 text-center">🧠</div>
+            <CardTitle className="text-2xl text-center">기억력 게임</CardTitle>
+            <CardDescription className="text-center text-base">같은 색상 카드를 찾아 매칭하세요!</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <p>🎴 카드 매칭 게임</p>
+              <p>🎯 25회 이하 시도로 완료하면 리워드 적립!</p>
+              <p>🧩 8쌍의 카드 매칭</p>
+            </div>
+            <Button className="w-full mt-4" size="lg" disabled={memoryCompleted}>
+              {memoryCompleted ? "오늘 완료 ✓" : "플레이하기 →"}
             </Button>
           </CardContent>
         </Card>
