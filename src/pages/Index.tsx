@@ -13,7 +13,6 @@ const Index = () => {
   const [avgClicks, setAvgClicks] = useState<number | null>(null);
   const [reactionCompleted, setReactionCompleted] = useState(false);
   const [gemCompleted, setGemCompleted] = useState(false);
-  const [fortuneCompleted, setFortuneCompleted] = useState(false);
   const [memoryCompleted, setMemoryCompleted] = useState(false);
 
   useEffect(() => {
@@ -43,7 +42,6 @@ const Index = () => {
     const today = new Date().toDateString();
     setReactionCompleted(localStorage.getItem("reactionRewardDate") === today);
     setGemCompleted(localStorage.getItem("gemRewardDate") === today);
-    setFortuneCompleted(localStorage.getItem("fortuneRewardDate") === today);
     setMemoryCompleted(localStorage.getItem("memoryRewardDate") === today);
   }, []);
 
@@ -126,32 +124,6 @@ const Index = () => {
             </div>
             <Button className="w-full mt-4" size="lg" disabled={gemCompleted}>
               {gemCompleted ? "오늘 완료 ✓" : "플레이하기 →"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
-          onClick={() => fortuneCompleted ? handleCompletedClick("오늘의 운세") : navigate("/fortune")}
-        >
-          {fortuneCompleted && (
-            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
-              적립완료
-            </Badge>
-          )}
-          <CardHeader>
-            <div className="text-6xl mb-4 text-center">✨</div>
-            <CardTitle className="text-2xl text-center">오늘의 운세</CardTitle>
-            <CardDescription className="text-center text-base">나의 오늘 운세를 확인해보세요!</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>🔮 오늘의 운세 점수</p>
-              <p>🍀 행운의 숫자 & 컬러</p>
-              <p>📅 양력/음력 선택 가능</p>
-            </div>
-            <Button className="w-full mt-4" size="lg" disabled={fortuneCompleted}>
-              {fortuneCompleted ? "오늘 완료 ✓" : "운세 보기 →"}
             </Button>
           </CardContent>
         </Card>
