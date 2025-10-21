@@ -8,8 +8,12 @@ import blueCharacter from "@/assets/character-blue.png";
 import redCharacter from "@/assets/character-red.png";
 import greenCharacter from "@/assets/character-green.png";
 import grayCharacter from "@/assets/character-gray.png";
+import yellowCharacter from "@/assets/character-yellow.png";
+import pinkCharacter from "@/assets/character-pink.png";
+import orangeCharacter from "@/assets/character-orange.png";
+import purpleCharacter from "@/assets/character-purple.png";
 
-type CardColor = "blue" | "red" | "green" | "gray";
+type CardColor = "blue" | "red" | "green" | "gray" | "yellow" | "pink" | "orange" | "purple";
 
 interface Card {
   id: number;
@@ -23,6 +27,10 @@ const characterMap = {
   red: redCharacter,
   green: greenCharacter,
   gray: grayCharacter,
+  yellow: yellowCharacter,
+  pink: pinkCharacter,
+  orange: orangeCharacter,
+  purple: purpleCharacter,
 };
 
 const MemoryGame = () => {
@@ -36,7 +44,7 @@ const MemoryGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
 
   const initializeGame = useCallback(() => {
-    const colors: CardColor[] = ["blue", "red", "green", "gray", "blue", "red", "green", "gray"];
+    const colors: CardColor[] = ["blue", "red", "green", "gray", "yellow", "pink", "orange", "purple"];
     const shuffled = [...colors, ...colors]
       .sort(() => Math.random() - 0.5)
       .map((color, index) => ({
@@ -111,7 +119,7 @@ const MemoryGame = () => {
   useEffect(() => {
     if (matchedPairs === 8 && startTime) {
       const timeTaken = Math.floor((Date.now() - startTime) / 1000);
-      const success = attempts <= 25;
+      const success = attempts <= 15;
 
       // 데이터베이스에 저장
       supabase
@@ -131,7 +139,7 @@ const MemoryGame = () => {
   }, [matchedPairs, attempts, startTime]);
 
   const isGameComplete = matchedPairs === 8;
-  const gotReward = attempts <= 25 && isGameComplete;
+  const gotReward = attempts <= 15 && isGameComplete;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-purple-900 dark:to-gray-900 p-6">
@@ -157,7 +165,7 @@ const MemoryGame = () => {
             <span className="font-semibold">매칭: {matchedPairs}/8</span>
           </div>
           <p className="text-sm text-primary font-semibold mt-2">
-            ⚡ 25회 이하 시도로 완료하면 리워드 적립!
+            ⚡ 15회 이하 시도로 완료하면 리워드 적립!
           </p>
         </div>
 
@@ -205,7 +213,7 @@ const MemoryGame = () => {
                 </p>
               ) : (
                 <p className="text-lg text-muted-foreground">
-                  25회 이하로 도전해보세요!
+                  15회 이하로 도전해보세요!
                 </p>
               )}
             </div>
