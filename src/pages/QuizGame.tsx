@@ -106,9 +106,6 @@ const QuizGame = () => {
     const correct = answer === questions[currentIndex].answer;
     if (correct) {
       setScore(score + 1);
-      toast.success("정답입니다! 🎉");
-    } else {
-      toast.error("오답입니다 😢");
     }
   };
 
