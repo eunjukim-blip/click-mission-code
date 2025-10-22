@@ -76,12 +76,18 @@ const QuizGameResult = () => {
               <p className="text-lg font-medium mb-4">
                 {question}
               </p>
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-2">
                 <span className="font-semibold">내 답변:</span>
                 <span className={isCorrect ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
                   {userAnswer === true ? "O" : "X"}
                 </span>
                 {isCorrect ? "✅" : "❌"}
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="font-semibold">정답:</span>
+                <span className="text-primary font-bold">
+                  {correctAnswer ? "O" : "X"}
+                </span>
               </div>
               <div className="bg-primary/10 p-4 rounded-lg">
                 <p className="font-semibold mb-2">해설</p>
