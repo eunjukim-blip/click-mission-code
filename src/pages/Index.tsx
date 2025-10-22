@@ -48,8 +48,8 @@ const Index = () => {
           onClick={() => navigate("/quiz")}
         >
           <CardHeader className="text-center pb-6 pt-8">
-            <div className="text-5xl mb-4">❓</div>
-            <CardTitle className="text-xl">OX퀴즈</CardTitle>
+            <div className="text-5xl mb-4">📰</div>
+            <CardTitle className="text-xl">오늘의 경제상식</CardTitle>
           </CardHeader>
         </Card>
       </div>
