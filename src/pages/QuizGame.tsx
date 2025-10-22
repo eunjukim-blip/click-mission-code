@@ -318,7 +318,7 @@ const QuizGame = () => {
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center mb-2">
-              <CardTitle className="text-2xl">오늘의 경제상식</CardTitle>
+              <CardTitle className="text-2xl">경제상식 OX퀴즈</CardTitle>
               <div className="text-lg font-bold">
                 1/1
               </div>

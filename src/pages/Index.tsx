@@ -49,7 +49,7 @@ const Index = () => {
         >
           <CardHeader className="text-center pb-6 pt-8">
             <div className="text-5xl mb-4">📰</div>
-            <CardTitle className="text-xl">오늘의 경제상식</CardTitle>
+            <CardTitle className="text-xl">경제상식 OX퀴즈</CardTitle>
           </CardHeader>
         </Card>
       </div>
