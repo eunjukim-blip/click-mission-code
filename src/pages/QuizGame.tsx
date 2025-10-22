@@ -152,31 +152,51 @@ const QuizGame = () => {
   }
 
   if (gameFinished) {
+    const finalScore = score + (userAnswer === questions[currentIndex].answer ? 1 : 0);
+    const isPerfect = finalScore === questions.length;
+    
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <Card className="w-full max-w-2xl">
           <CardHeader>
-            <CardTitle className="text-3xl text-center">게임 종료!</CardTitle>
+            <CardTitle className="text-3xl text-center">
+              {isPerfect ? "🎉 완벽합니다!" : "😢 아쉽네요!"}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="text-center">
-              <p className="text-6xl mb-4">
-                {score === 3 ? "🎉" : score >= 2 ? "😊" : "💪"}
-              </p>
-              <p className="text-2xl font-bold mb-2">
-                최종 점수: {score}/3
-              </p>
-              <p className="text-muted-foreground">
-                {score === 3 && "완벽합니다!"}
-                {score === 2 && "훌륭해요!"}
-                {score < 2 && "다음엔 더 잘하실 거예요!"}
-              </p>
-            </div>
+            {!isPerfect && (
+              <>
+                <div className="text-center">
+                  <p className="text-lg text-muted-foreground mb-4">
+                    다시 도전해보세요!
+                  </p>
+                </div>
+
+                {/* 광고 보고 다시풀기 */}
+                <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground mb-2">광고를 시청하고 다시 풀기</p>
+                  <div className="h-32 flex items-center justify-center bg-background/50 rounded mb-3">
+                    <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+                  </div>
+                  <Button onClick={() => window.location.reload()} className="w-full">
+                    광고 보고 다시 풀기
+                  </Button>
+                </div>
+              </>
+            )}
+
+            {isPerfect && (
+              <div className="text-center">
+                <p className="text-6xl mb-4">🎉</p>
+                <p className="text-lg text-muted-foreground">
+                  모든 문제를 맞추셨습니다!
+                </p>
+              </div>
+            )}
 
             {/* Google AdSense 배너 */}
             <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
               <p className="text-sm text-muted-foreground mb-2">광고</p>
-              {/* Google AdSense 코드를 여기에 추가하세요 */}
               <div className="h-24 flex items-center justify-center bg-background/50 rounded">
                 <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
               </div>
@@ -190,7 +210,12 @@ const QuizGame = () => {
               </div>
             ) : recommendedProducts.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-center">추천 상품</h3>
+                <div className="text-center space-y-2">
+                  <h3 className="text-lg font-semibold">추천 상품</h3>
+                  <p className="text-sm text-primary font-bold">
+                    💰 리워드 받으면 100원 추가 적립!
+                  </p>
+                </div>
                 <div className="space-y-3">
                   {recommendedProducts.map((product) => (
                     <Card key={product.id} className="overflow-hidden">
@@ -212,7 +237,7 @@ const QuizGame = () => {
                             )}
                             <div className="flex items-center justify-between gap-2">
                               <span className="text-sm font-bold text-primary">
-                                {product.reward_amount.toLocaleString()}원 적립
+                                {product.reward_amount.toLocaleString()}원 + 100원 적립
                               </span>
                               <Button
                                 size="sm"
@@ -232,7 +257,7 @@ const QuizGame = () => {
               </div>
             )}
 
-            <Button onClick={handleRestart} className="w-full" size="lg">
+            <Button onClick={handleRestart} className="w-full" size="lg" variant="outline">
               홈으로 돌아가기
             </Button>
           </CardContent>
