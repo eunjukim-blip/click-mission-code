@@ -39,7 +39,7 @@ const Index = () => {
         >
           <CardHeader className="text-center pb-6 pt-8">
             <div className="text-5xl mb-4">⏱️</div>
-            <CardTitle className="text-xl">많이 클릭하기</CardTitle>
+            <CardTitle className="text-xl">반응게임</CardTitle>
           </CardHeader>
         </Card>
 
