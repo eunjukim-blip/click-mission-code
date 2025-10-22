@@ -42,7 +42,7 @@ serve(async (req) => {
           },
           {
             role: "user",
-            content: `${date} 날짜와 관련된 5개의 OX 퀴즈를 생성해주세요. 이 날짜에 실제로 일어난 역사적 사건, 기념일, 유명인 생일 등을 포함해주세요. JSON 형식으로만 응답해주세요.`
+            content: `${date} 날짜와 관련된 3개의 OX 퀴즈를 생성해주세요. 이 날짜에 실제로 일어난 역사적 사건, 기념일, 유명인 생일 등을 포함해주세요. JSON 형식으로만 응답해주세요.`
           }
         ],
         tools: [
@@ -50,7 +50,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "generate_quiz",
-              description: "Generate 5 OX quiz questions",
+              description: "Generate 3 OX quiz questions",
               parameters: {
                 type: "object",
                 properties: {
@@ -66,8 +66,8 @@ serve(async (req) => {
                       required: ["question", "answer", "explanation"],
                       additionalProperties: false
                     },
-                    minItems: 5,
-                    maxItems: 5
+                    minItems: 3,
+                    maxItems: 3
                   }
                 },
                 required: ["questions"],

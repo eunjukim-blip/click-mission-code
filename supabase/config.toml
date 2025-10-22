@@ -2,3 +2,6 @@ project_id = "pcdhsnfnuwvpveimyoae"
 
 [functions.generate-quiz]
 verify_jwt = false
+
+[functions.recommend-products]
+verify_jwt = false

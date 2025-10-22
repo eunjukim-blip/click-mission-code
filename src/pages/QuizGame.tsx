@@ -4,12 +4,22 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, Check, X } from "lucide-react";
+import { ArrowLeft, Check, X, ExternalLink } from "lucide-react";
 
 interface Question {
   question: string;
   answer: boolean;
   explanation: string;
+}
+
+interface Product {
+  id: string;
+  name: string;
+  link: string;
+  reward_amount: number;
+  category: string;
+  description: string;
+  image_url?: string;
 }
 
 const QuizGame = () => {
@@ -21,6 +31,8 @@ const QuizGame = () => {
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [gameFinished, setGameFinished] = useState(false);
+  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
 
   useEffect(() => {
     loadQuiz();
@@ -72,13 +84,51 @@ const QuizGame = () => {
       setAnswered(false);
       setUserAnswer(null);
     } else {
-      setGameFinished(true);
-      const finalScore = score + (userAnswer === questions[currentIndex].answer ? 1 : 0);
-      if (finalScore === 5) {
-        toast.success("🎉 완벽합니다! 모든 문제를 맞추셨어요!");
-      } else {
-        toast.info(`게임 종료! ${finalScore}/5 정답`);
+      finishGame();
+    }
+  };
+
+  const finishGame = async () => {
+    setGameFinished(true);
+    const finalScore = score + (userAnswer === questions[currentIndex].answer ? 1 : 0);
+    
+    // 퀴즈 완료 저장
+    try {
+      const userIdentifier = localStorage.getItem('user_id') || crypto.randomUUID();
+      localStorage.setItem('user_id', userIdentifier);
+      
+      await supabase.from('quiz_completions').insert({
+        user_identifier: userIdentifier,
+        score: finalScore,
+        completion_date: new Date().toISOString().split('T')[0]
+      });
+    } catch (error) {
+      console.error('Error saving completion:', error);
+    }
+
+    // 상품 추천 받기
+    setLoadingProducts(true);
+    try {
+      const quizTopics = questions.map(q => q.question);
+      const { data, error } = await supabase.functions.invoke('recommend-products', {
+        body: { quizTopics }
+      });
+
+      if (error) {
+        console.error('Error loading products:', error);
+      } else if (data?.products) {
+        setRecommendedProducts(data.products);
       }
+    } catch (error) {
+      console.error('Error:', error);
+    } finally {
+      setLoadingProducts(false);
+    }
+
+    if (finalScore === 3) {
+      toast.success("🎉 완벽합니다! 모든 문제를 맞추셨어요!");
+    } else {
+      toast.info(`게임 종료! ${finalScore}/3 정답`);
     }
   };
 
@@ -111,18 +161,77 @@ const QuizGame = () => {
           <CardContent className="space-y-6">
             <div className="text-center">
               <p className="text-6xl mb-4">
-                {score === 5 ? "🎉" : score >= 3 ? "😊" : "💪"}
+                {score === 3 ? "🎉" : score >= 2 ? "😊" : "💪"}
               </p>
               <p className="text-2xl font-bold mb-2">
-                최종 점수: {score}/5
+                최종 점수: {score}/3
               </p>
               <p className="text-muted-foreground">
-                {score === 5 && "완벽합니다!"}
-                {score === 4 && "훌륭해요!"}
-                {score === 3 && "좋아요!"}
-                {score < 3 && "다음엔 더 잘하실 거예요!"}
+                {score === 3 && "완벽합니다!"}
+                {score === 2 && "훌륭해요!"}
+                {score < 2 && "다음엔 더 잘하실 거예요!"}
               </p>
             </div>
+
+            {/* Google AdSense 배너 */}
+            <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
+              <p className="text-sm text-muted-foreground mb-2">광고</p>
+              {/* Google AdSense 코드를 여기에 추가하세요 */}
+              <div className="h-24 flex items-center justify-center bg-background/50 rounded">
+                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+              </div>
+            </div>
+
+            {/* 오퍼월 상품 추천 */}
+            {loadingProducts ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
+                <p className="text-sm text-muted-foreground">추천 상품을 불러오는 중...</p>
+              </div>
+            ) : recommendedProducts.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-center">추천 상품</h3>
+                <div className="space-y-3">
+                  {recommendedProducts.map((product) => (
+                    <Card key={product.id} className="overflow-hidden">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          {product.image_url && (
+                            <img 
+                              src={product.image_url} 
+                              alt={product.name}
+                              className="w-16 h-16 object-cover rounded"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-sm mb-1">{product.name}</h4>
+                            {product.description && (
+                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
+                                {product.description}
+                              </p>
+                            )}
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-sm font-bold text-primary">
+                                {product.reward_amount.toLocaleString()}원 적립
+                              </span>
+                              <Button
+                                size="sm"
+                                onClick={() => window.open(product.link, '_blank')}
+                                className="gap-1"
+                              >
+                                적립받기
+                                <ExternalLink className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <Button onClick={handleRestart} className="w-full" size="lg">
               홈으로 돌아가기
             </Button>
@@ -151,7 +260,7 @@ const QuizGame = () => {
             <div className="flex justify-between items-center mb-2">
               <CardTitle className="text-2xl">OX 퀴즈</CardTitle>
               <div className="text-lg font-bold">
-                {currentIndex + 1}/5
+                {currentIndex + 1}/3
               </div>
             </div>
             <div className="flex gap-2 mt-2">

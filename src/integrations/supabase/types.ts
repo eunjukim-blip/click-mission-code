@@ -59,6 +59,72 @@ export type Database = {
         }
         Relationships: []
       }
+      offerwall_products: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          keywords: string[] | null
+          link: string
+          name: string
+          reward_amount: number
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          keywords?: string[] | null
+          link: string
+          name: string
+          reward_amount: number
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          keywords?: string[] | null
+          link?: string
+          name?: string
+          reward_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      quiz_completions: {
+        Row: {
+          completion_date: string
+          created_at: string
+          id: string
+          score: number
+          user_identifier: string
+        }
+        Insert: {
+          completion_date?: string
+          created_at?: string
+          id?: string
+          score: number
+          user_identifier: string
+        }
+        Update: {
+          completion_date?: string
+          created_at?: string
+          id?: string
+          score?: number
+          user_identifier?: string
+        }
+        Relationships: []
+      }
       reaction_game_results: {
         Row: {
           created_at: string | null
