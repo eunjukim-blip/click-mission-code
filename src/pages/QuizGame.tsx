@@ -123,7 +123,6 @@ const QuizGame = () => {
   };
 
   const finishGame = async () => {
-    setGameFinished(true);
     const finalScore = score + (userAnswer === questions[currentIndex].answer ? 1 : 0);
     
     // 퀴즈 완료 저장
@@ -146,6 +145,14 @@ const QuizGame = () => {
     } else {
       toast.info(`아쉽지만 다시 도전해보세요!`);
     }
+
+    // 결과 페이지로 이동
+    navigate('/quiz/result', { 
+      state: { 
+        score: finalScore, 
+        totalQuestions: questions.length 
+      } 
+    });
   };
 
   const handleRestart = () => {
@@ -167,84 +174,6 @@ const QuizGame = () => {
     );
   }
 
-  if (gameFinished) {
-    const finalScore = score + (userAnswer === questions[currentIndex].answer ? 1 : 0);
-    const isPerfect = finalScore === questions.length;
-    
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <CardTitle className="text-3xl text-center">
-              {isPerfect ? "🎉 완벽합니다!" : "😢 아쉽네요!"}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {!isPerfect && (
-              <>
-                <div className="text-center">
-                  <p className="text-lg text-muted-foreground mb-4">
-                    다시 도전해보세요!
-                  </p>
-                </div>
-
-                {/* 광고 보고 다시풀기 */}
-                <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
-                  <p className="text-sm text-muted-foreground mb-2">광고를 시청하고 다시 풀기</p>
-                  <div className="h-32 flex items-center justify-center bg-background/50 rounded mb-3">
-                    <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
-                  </div>
-                  <Button 
-                    onClick={handleRetry} 
-                    className="w-full"
-                    disabled={!canRetry}
-                  >
-                    {canRetry ? `광고 보고 다시 풀기 (${3 - retryCount}회 남음)` : '오늘 재시도 횟수를 모두 사용했습니다'}
-                  </Button>
-                </div>
-              </>
-            )}
-
-            {isPerfect && (
-              <div className="text-center">
-                <p className="text-6xl mb-4">🎉</p>
-                <p className="text-lg text-muted-foreground">
-                  모든 문제를 맞추셨습니다!
-                </p>
-              </div>
-            )}
-
-            {/* Google AdSense 배너 */}
-            <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
-              <p className="text-sm text-muted-foreground mb-2">광고</p>
-              <div className="h-24 flex items-center justify-center bg-background/50 rounded">
-                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
-              </div>
-            </div>
-
-            {/* 오퍼월 광고 영역 */}
-            <div className="space-y-4">
-              <div className="text-center space-y-2">
-                <h3 className="text-lg font-semibold">추천 상품</h3>
-                <p className="text-sm text-primary font-bold">
-                  💰 여기서 적립받으면 10% 추가적립!
-                </p>
-              </div>
-              <div className="w-full bg-secondary/30 p-6 rounded-lg text-center">
-                <div className="h-48 flex items-center justify-center bg-background/50 rounded">
-                  <p className="text-sm text-muted-foreground">오퍼월 광고 영역</p>
-                </div>
-              </div>
-            </div>
-
-            <Button onClick={handleRestart} className="w-full" size="lg" variant="outline">
-              홈으로 돌아가기
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const currentQuestion = questions[currentIndex];
 

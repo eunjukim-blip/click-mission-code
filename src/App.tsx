@@ -9,6 +9,7 @@ import GemGame from "./pages/GemGame";
 import FortuneGame from "./pages/FortuneGame";
 import MemoryGame from "./pages/MemoryGame";
 import QuizGame from "./pages/QuizGame";
+import QuizGameResult from "./pages/QuizGameResult";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/fortune" element={<FortuneGame />} />
           <Route path="/memory" element={<MemoryGame />} />
           <Route path="/quiz" element={<QuizGame />} />
+          <Route path="/quiz/result" element={<QuizGameResult />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
