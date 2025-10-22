@@ -4,22 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ArrowLeft, Check, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, Check, X } from "lucide-react";
 
 interface Question {
   question: string;
   answer: boolean;
   explanation: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  link: string;
-  reward_amount: number;
-  category: string;
-  description: string;
-  image_url?: string;
 }
 
 const QuizGame = () => {
@@ -31,8 +21,6 @@ const QuizGame = () => {
   const [userAnswer, setUserAnswer] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [gameFinished, setGameFinished] = useState(false);
-  const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
-  const [loadingProducts, setLoadingProducts] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [canRetry, setCanRetry] = useState(true);
 
@@ -137,29 +125,10 @@ const QuizGame = () => {
       console.error('Error saving completion:', error);
     }
 
-    // 상품 추천 받기
-    setLoadingProducts(true);
-    try {
-      const quizTopics = questions.map(q => q.question);
-      const { data, error } = await supabase.functions.invoke('recommend-products', {
-        body: { quizTopics }
-      });
-
-      if (error) {
-        console.error('Error loading products:', error);
-      } else if (data?.products) {
-        setRecommendedProducts(data.products);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoadingProducts(false);
-    }
-
-    if (finalScore === 3) {
+    if (finalScore === questions.length) {
       toast.success("🎉 완벽합니다! 모든 문제를 맞추셨어요!");
     } else {
-      toast.info(`게임 종료! ${finalScore}/3 정답`);
+      toast.info(`아쉽지만 다시 도전해보세요!`);
     }
   };
 
@@ -237,60 +206,20 @@ const QuizGame = () => {
               </div>
             </div>
 
-            {/* 오퍼월 상품 추천 */}
-            {loadingProducts ? (
-              <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-                <p className="text-sm text-muted-foreground">추천 상품을 불러오는 중...</p>
+            {/* 오퍼월 광고 영역 */}
+            <div className="space-y-4">
+              <div className="text-center space-y-2">
+                <h3 className="text-lg font-semibold">추천 상품</h3>
+                <p className="text-sm text-primary font-bold">
+                  💰 여기서 적립받으면 10% 추가적립!
+                </p>
               </div>
-            ) : recommendedProducts.length > 0 && (
-              <div className="space-y-4">
-                <div className="text-center space-y-2">
-                  <h3 className="text-lg font-semibold">추천 상품</h3>
-                  <p className="text-sm text-primary font-bold">
-                    💰 리워드 받으면 100원 추가 적립!
-                  </p>
-                </div>
-                <div className="space-y-3">
-                  {recommendedProducts.map((product) => (
-                    <Card key={product.id} className="overflow-hidden">
-                      <CardContent className="p-4">
-                        <div className="flex items-start gap-3">
-                          {product.image_url && (
-                            <img 
-                              src={product.image_url} 
-                              alt={product.name}
-                              className="w-16 h-16 object-cover rounded"
-                            />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold text-sm mb-1">{product.name}</h4>
-                            {product.description && (
-                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">
-                                {product.description}
-                              </p>
-                            )}
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-sm font-bold text-primary">
-                                {product.reward_amount.toLocaleString()}원 + 100원 적립
-                              </span>
-                              <Button
-                                size="sm"
-                                onClick={() => window.open(product.link, '_blank')}
-                                className="gap-1"
-                              >
-                                적립받기
-                                <ExternalLink className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+              <div className="w-full bg-secondary/30 p-6 rounded-lg text-center">
+                <div className="h-48 flex items-center justify-center bg-background/50 rounded">
+                  <p className="text-sm text-muted-foreground">오퍼월 광고 영역</p>
                 </div>
               </div>
-            )}
+            </div>
 
             <Button onClick={handleRestart} className="w-full" size="lg" variant="outline">
               홈으로 돌아가기
