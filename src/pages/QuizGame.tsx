@@ -258,14 +258,14 @@ const QuizGame = () => {
         <Card>
           <CardHeader>
             <div className="flex justify-between items-center mb-2">
-              <CardTitle className="text-2xl">OX 퀴즈</CardTitle>
+              <CardTitle className="text-2xl">금융/경제 상식 퀴즈</CardTitle>
               <div className="text-lg font-bold">
-                {currentIndex + 1}/3
+                1/1
               </div>
             </div>
             <div className="flex gap-2 mt-2">
               <div className="text-sm text-muted-foreground">
-                점수: {score}
+                한국 시장 금융/보험 기초 상식
               </div>
             </div>
           </CardHeader>

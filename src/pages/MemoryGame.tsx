@@ -251,6 +251,14 @@ const MemoryGame = () => {
           </div>
         ) : roundComplete && currentRound < 3 ? (
           <div className="text-center space-y-6">
+            {/* Google AdSense 배너 */}
+            <div className="w-full max-w-md mx-auto bg-secondary/30 p-4 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-2">광고</p>
+              <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+              </div>
+            </div>
+
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-foreground">
               라운드 {currentRound} 완료!
@@ -277,6 +285,14 @@ const MemoryGame = () => {
           </div>
         ) : (
           <div className="text-center space-y-6">
+            {/* Google AdSense 배너 */}
+            <div className="w-full max-w-md mx-auto bg-secondary/30 p-4 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-2">광고</p>
+              <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+              </div>
+            </div>
+
             <div className="text-6xl mb-4">
               {attempts <= 15 ? "🎉" : "✨"}
             </div>

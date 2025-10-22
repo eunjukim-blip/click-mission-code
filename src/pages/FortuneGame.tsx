@@ -345,6 +345,14 @@ const FortuneGame = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Google AdSense 배너 - 상단 */}
+              <div className="w-full bg-white/50 p-4 rounded-lg text-center border border-orange-200">
+                <p className="text-xs text-muted-foreground mb-2">광고</p>
+                <div className="h-24 flex items-center justify-center bg-background/50 rounded">
+                  <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+                </div>
+              </div>
+
               <div className="space-y-4">
                 <div className="bg-white/70 rounded-lg p-4 shadow-sm">
                   <h3 className="text-lg font-bold text-orange-600 mb-2 flex items-center gap-2">
@@ -371,6 +379,14 @@ const FortuneGame = () => {
                 <div className="bg-white/70 rounded-lg p-4 shadow-sm">
                   <h3 className="text-base font-bold text-orange-600 mb-2">행운의 컬러</h3>
                   <p className="text-xl font-bold text-orange-700">{getFortuneForYear(selectedZodiac, selectedYear).luckyColor}</p>
+                </div>
+              </div>
+
+              {/* Google AdSense 배너 - 하단 */}
+              <div className="w-full bg-white/50 p-4 rounded-lg text-center border border-orange-200">
+                <p className="text-xs text-muted-foreground mb-2">광고</p>
+                <div className="h-24 flex items-center justify-center bg-background/50 rounded">
+                  <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
                 </div>
               </div>
 

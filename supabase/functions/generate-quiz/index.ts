@@ -31,18 +31,20 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `당신은 흥미롭고 재미있는 OX 퀴즈를 만드는 전문가입니다. 
-주어진 날짜를 기반으로 그 날에 일어난 역사적 사건, 기념일, 유명인 생일 등과 관련된 5개의 OX 퀴즈를 생성합니다.
-퀴즈는 해당 날짜와 직접적으로 연관된 내용이어야 하며, 각 퀴즈는 명확하고 흥미로우며, 정답이 분명해야 합니다.
-예를 들어:
-- 이 날 태어난 유명인
-- 이 날 일어난 역사적 사건
-- 이 날이 기념일인 것들
-- 이 날과 관련된 문화적 사건`
+            content: `당신은 한국 금융/보험 및 경제 상식을 다루는 OX 퀴즈 전문가입니다. 
+한국 시장에 특화된 금융, 보험, 경제 관련 기초 상식 퀴즈를 생성합니다.
+퀴즈는 다음 주제를 중심으로 구성해주세요:
+- 한국의 금융 제도 (예: 예금자 보호, 금리, 대출 등)
+- 보험 상품 및 보장 내용 (예: 실손보험, 자동차보험, 생명보험 등)
+- 경제 기초 개념 (예: 인플레이션, GDP, 환율 등)
+- 한국의 경제 정책 및 금융 규제
+- 개인 재무 관리 상식 (예: 신용점수, 세금, 연금 등)
+
+퀴즈는 명확하고 실용적이며, 일반인이 알아두면 유용한 금융/보험 상식 위주로 작성해주세요.`
           },
           {
             role: "user",
-            content: `${date} 날짜와 관련된 3개의 OX 퀴즈를 생성해주세요. 이 날짜에 실제로 일어난 역사적 사건, 기념일, 유명인 생일 등을 포함해주세요. JSON 형식으로만 응답해주세요.`
+            content: `한국 시장에 맞는 금융/보험 및 기초 경제 상식 OX 퀴즈 1개를 생성해주세요. 실생활에 유용한 정보 위주로 작성해주세요. JSON 형식으로만 응답해주세요.`
           }
         ],
         tools: [
@@ -50,7 +52,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "generate_quiz",
-              description: "Generate 3 OX quiz questions",
+              description: "Generate 1 OX quiz question about Korean financial/insurance basics",
               parameters: {
                 type: "object",
                 properties: {
@@ -66,8 +68,8 @@ serve(async (req) => {
                       required: ["question", "answer", "explanation"],
                       additionalProperties: false
                     },
-                    minItems: 3,
-                    maxItems: 3
+                    minItems: 1,
+                    maxItems: 1
                   }
                 },
                 required: ["questions"],

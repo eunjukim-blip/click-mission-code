@@ -147,6 +147,14 @@ const ReactionGame = () => {
       {/* Intro Screen */}
       {stage === "intro" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
+          {/* Google AdSense 배너 */}
+          <div className="w-full max-w-md bg-secondary/30 p-4 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground mb-2">광고</p>
+            <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+              <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+            </div>
+          </div>
+
           <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 text-center">
             캐릭터 반응 게임 🎨
           </h1>
@@ -195,6 +203,14 @@ const ReactionGame = () => {
       {/* Result Screen */}
       {stage === "result" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500">
+          {/* Google AdSense 배너 */}
+          <div className="w-full max-w-md bg-secondary/30 p-4 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground mb-2">광고</p>
+            <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+              <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+            </div>
+          </div>
+
           <h2 className="text-3xl font-bold text-foreground">결과</h2>
           <GameCard color={gameColor}>{resultMessage}</GameCard>
           <div className="flex flex-col gap-3">

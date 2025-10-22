@@ -116,6 +116,14 @@ const GemGame = () => {
       {/* Intro Screen */}
       {stage === "intro" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500 max-w-md">
+          {/* Google AdSense 배너 - 상단 */}
+          <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground mb-2">광고</p>
+            <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+              <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+            </div>
+          </div>
+
           <h1 className="text-3xl md:text-4xl font-black text-foreground mb-2 text-center">
             보석 캐기 챌린지 💎
           </h1>
@@ -230,6 +238,14 @@ const GemGame = () => {
       {/* Result Screen */}
       {stage === "result" && (
         <div className="flex flex-col items-center gap-6 animate-in fade-in duration-500 max-w-md">
+          {/* Google AdSense 배너 - 상단 */}
+          <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
+            <p className="text-xs text-muted-foreground mb-2">광고</p>
+            <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+              <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+            </div>
+          </div>
+
           <h2 className="text-4xl font-bold text-foreground">
             {clicks >= TARGET_CLICKS ? "🎉 성공!" : "아쉬워요!"}
           </h2>
