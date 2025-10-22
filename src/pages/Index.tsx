@@ -28,7 +28,7 @@ const Index = () => {
           onClick={() => navigate("/gem")}
         >
           <CardHeader className="text-center pb-6 pt-8">
-            <div className="text-5xl mb-4">🎨</div>
+            <div className="text-5xl mb-4">💎</div>
             <CardTitle className="text-xl">보석캐기</CardTitle>
           </CardHeader>
         </Card>
