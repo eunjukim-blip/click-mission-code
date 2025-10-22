@@ -72,9 +72,10 @@ const QuizGame = () => {
     try {
       setLoading(true);
       const today = new Date().toDateString();
+      const uniqueId = Date.now(); // 매번 다른 퀴즈를 위한 타임스탬프
       
       const { data, error } = await supabase.functions.invoke('generate-quiz', {
-        body: { date: today }
+        body: { date: `${today}-${uniqueId}` }
       });
 
       if (error) {
