@@ -29,7 +29,7 @@ const ReactionGame = () => {
 
   const startGame = useCallback(() => {
     setStage("waiting");
-    setGameColor("green");
+    setGameColor("blue");
     setReactionTime(null);
     setStartTime(null);
 
@@ -37,7 +37,7 @@ const ReactionGame = () => {
     const delay = Math.random() * 3000 + 2000;
   
     setTimeout(() => {
-      setGameColor("gray");
+      setGameColor("red");
       setStage("ready");
     }, delay);
   }, []);
@@ -50,7 +50,7 @@ const ReactionGame = () => {
     if (stage === "waiting") {
       // Too early!
       setStage("result");
-      setGameColor("gray");
+      setGameColor("red");
       setResultMessage("너무 빨라요! 😅");
       setReactionTime(null);
     } else if (stage === "ready" && startTime) {
@@ -58,7 +58,7 @@ const ReactionGame = () => {
       const time = Date.now() - startTime;
       setReactionTime(time);
       setStage("result");
-      setGameColor("gray");
+      setGameColor("red");
       
       // 데이터베이스에 저장
       supabase
@@ -86,7 +86,7 @@ const ReactionGame = () => {
 
   const retry = useCallback(() => {
     setStage("intro");
-    setGameColor("green");
+    setGameColor("blue");
     setStartTime(null);
     setReactionTime(null);
     setResultMessage("");
@@ -105,7 +105,7 @@ const ReactionGame = () => {
     if (stage === "ready") {
       const timeout = setTimeout(() => {
         setStage("result");
-        setGameColor("gray");
+        setGameColor("red");
         setResultMessage("시간 초과! ⏰");
         setReactionTime(null);
       }, 5000);
@@ -160,7 +160,7 @@ const ReactionGame = () => {
           </h1>
           <div className="text-center">
             <p className="text-lg text-muted-foreground mb-2">
-              개구리가 고양이로 바뀔 때 터치하세요!
+              토끼가 여우로 바뀔 때 터치하세요!
             </p>
             <p className="text-lg text-primary font-semibold">
               ⚡ 0.3초 보다 빠르면 리워드 적립!
@@ -170,7 +170,7 @@ const ReactionGame = () => {
             <h2 className="text-2xl font-bold text-foreground mb-4 text-center">
               준비하세요!
             </h2>
-            <GameCard color="green" />
+            <GameCard color="blue" />
           </div>
           <Button
             onClick={startGame}
@@ -190,11 +190,11 @@ const ReactionGame = () => {
               {stage === "waiting" ? "기다려요..." : ""}
             </h2>
             <p className="text-lg text-muted-foreground">
-              캐릭터가 고양이로 바뀔 때 터치하세요
+              캐릭터가 여우로 바뀔 때 터치하세요
             </p>
           </div>
           <GameCard color={gameColor} onClick={handleTap} onRedVisible={handleRedVisible}>
-            {gameColor === "gray" ? "터치" : ""}
+            {gameColor === "red" ? "터치" : ""}
           </GameCard>
           <p className="text-muted-foreground">* 캐릭터를 터치하세요</p>
         </div>
