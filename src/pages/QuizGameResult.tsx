@@ -66,7 +66,7 @@ const QuizGameResult = () => {
       <Card className="w-full max-w-2xl">
         <CardHeader>
           <CardTitle className="text-3xl text-center">
-            {isPerfect ? "🎉 완벽합니다!" : "😢 아쉽네요!"}
+            {isCorrect ? "🎉 정답입니다!" : "😢 아쉬워요!"}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
