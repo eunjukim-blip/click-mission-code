@@ -276,6 +276,15 @@ const QuizGame = () => {
               </p>
             </div>
 
+            {/* Google AdSense 배너 */}
+            <div className="w-full bg-secondary/30 p-4 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-2">광고</p>
+              {/* Google AdSense 코드를 여기에 추가하세요 */}
+              <div className="h-24 flex items-center justify-center bg-background/50 rounded">
+                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+              </div>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <Button
                 size="lg"
