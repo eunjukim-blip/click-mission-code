@@ -12,7 +12,7 @@ const Index = () => {
         <h1 className="text-4xl md:text-5xl font-bold text-foreground">데일리미션</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl w-full animate-in fade-in duration-700">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl w-full animate-in fade-in duration-700">
         <Card
           className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
           onClick={() => navigate("/memory")}
@@ -40,6 +40,16 @@ const Index = () => {
           <CardHeader className="text-center pb-6 pt-8">
             <div className="text-5xl mb-4">⏱️</div>
             <CardTitle className="text-xl">많이 클릭하기</CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
+          onClick={() => navigate("/quiz")}
+        >
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">❓</div>
+            <CardTitle className="text-xl">OX퀴즈</CardTitle>
           </CardHeader>
         </Card>
       </div>
