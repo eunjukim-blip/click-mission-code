@@ -140,17 +140,15 @@ const QuizGame = () => {
       console.error('Error saving completion:', error);
     }
 
-    if (finalScore === questions.length) {
-      toast.success("🎉 완벽합니다! 모든 문제를 맞추셨어요!");
-    } else {
-      toast.info(`아쉽지만 다시 도전해보세요!`);
-    }
-
     // 결과 페이지로 이동
     navigate('/quiz/result', { 
       state: { 
         score: finalScore, 
-        totalQuestions: questions.length 
+        totalQuestions: questions.length,
+        question: questions[currentIndex].question,
+        correctAnswer: questions[currentIndex].answer,
+        userAnswer: userAnswer,
+        explanation: questions[currentIndex].explanation
       } 
     });
   };
@@ -248,16 +246,8 @@ const QuizGame = () => {
 
             {answered && (
               <div className="space-y-4">
-                <div className="bg-primary/10 p-4 rounded-lg">
-                  <p className="font-semibold mb-2">
-                    정답: {questions[currentIndex].answer ? "O" : "X"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {currentQuestion?.explanation}
-                  </p>
-                </div>
                 <Button onClick={handleNext} className="w-full" size="lg">
-                  {currentIndex < questions.length - 1 ? "다음 문제" : "결과 보기"}
+                  결과 보기
                 </Button>
               </div>
             )}

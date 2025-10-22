@@ -9,8 +9,24 @@ const QuizGameResult = () => {
   const [retryCount, setRetryCount] = useState(0);
   const [canRetry, setCanRetry] = useState(true);
 
-  const { score, totalQuestions } = location.state || { score: 0, totalQuestions: 1 };
+  const { 
+    score, 
+    totalQuestions, 
+    question, 
+    correctAnswer, 
+    userAnswer, 
+    explanation 
+  } = location.state || { 
+    score: 0, 
+    totalQuestions: 1, 
+    question: '', 
+    correctAnswer: false, 
+    userAnswer: null, 
+    explanation: '' 
+  };
+  
   const isPerfect = score === totalQuestions;
+  const isCorrect = userAnswer === correctAnswer;
 
   useEffect(() => {
     checkRetryLimit();
@@ -54,6 +70,34 @@ const QuizGameResult = () => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
+          {/* 문제와 정답 표시 */}
+          <div className="space-y-4">
+            <div className="bg-secondary/50 p-6 rounded-lg">
+              <p className="text-lg font-medium mb-4">
+                {question}
+              </p>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-semibold">내 답변:</span>
+                <span className={isCorrect ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                  {userAnswer === true ? "O" : "X"}
+                </span>
+                {isCorrect ? "✅" : "❌"}
+              </div>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="font-semibold">정답:</span>
+                <span className="text-primary font-bold">
+                  {correctAnswer ? "O" : "X"}
+                </span>
+              </div>
+              <div className="bg-primary/10 p-4 rounded-lg">
+                <p className="font-semibold mb-2">해설</p>
+                <p className="text-sm text-muted-foreground">
+                  {explanation}
+                </p>
+              </div>
+            </div>
+          </div>
+
           {!isPerfect && (
             <>
               <div className="text-center">
