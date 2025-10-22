@@ -1,154 +1,58 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
-import missionBanner from "@/assets/mission-center-banner.jpg";
+import { Card, CardHeader, CardTitle } from "@/components/ui/card";
+import { Gamepad2 } from "lucide-react";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [avgReactionTime, setAvgReactionTime] = useState<number | null>(null);
-  const [avgClicks, setAvgClicks] = useState<number | null>(null);
-  const [reactionCompleted, setReactionCompleted] = useState(false);
-  const [gemCompleted, setGemCompleted] = useState(false);
-
-  useEffect(() => {
-    // 반응속도 평균 가져오기
-    supabase
-      .from('reaction_game_results')
-      .select('reaction_time')
-      .then(({ data, error }) => {
-        if (!error && data && data.length > 0) {
-          const sum = data.reduce((acc, row) => acc + row.reaction_time, 0);
-          setAvgReactionTime(sum / data.length);
-        }
-      });
-
-    // 클릭 평균 가져오기
-    supabase
-      .from('gem_game_results')
-      .select('clicks')
-      .then(({ data, error }) => {
-        if (!error && data && data.length > 0) {
-          const sum = data.reduce((acc, row) => acc + row.clicks, 0);
-          setAvgClicks(sum / data.length);
-        }
-      });
-
-    // 오늘 완료 여부 확인
-    const today = new Date().toDateString();
-    setReactionCompleted(localStorage.getItem("reactionRewardDate") === today);
-    setGemCompleted(localStorage.getItem("gemRewardDate") === today);
-  }, []);
-
-  const handleCompletedClick = (gameName: string) => {
-    toast.info("오늘은 플레이가 끝났어요", {
-      description: `${gameName}는 내일 다시 플레이할 수 있습니다.`,
-      duration: 3000,
-    });
-  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-secondary/10 flex flex-col items-center justify-center p-4 pb-16 gap-8">
-      <div className="w-full max-w-6xl mb-4 mt-8 animate-in fade-in duration-500">
-        <img 
-          src={missionBanner} 
-          alt="미션 센터 배너" 
-          className="w-full h-auto rounded-2xl shadow-2xl"
-        />
-      </div>
-      
-      <div className="text-center mb-4 animate-in fade-in duration-500">
-        <h1 className="text-3xl md:text-5xl font-black text-foreground mb-4">데일리미션 🎯</h1>
-        <p className="text-xl text-muted-foreground">원하는 미션을 선택하고 리워드를 받으세요!</p>
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+      <div className="text-center mb-12 animate-in fade-in duration-500">
+        <Gamepad2 className="w-24 h-24 mx-auto mb-6 text-primary" strokeWidth={1.5} />
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground">돈 버는 재미</h1>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl w-full animate-in fade-in duration-700">
+      <div className="grid grid-cols-2 gap-4 max-w-2xl w-full animate-in fade-in duration-700">
         <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
-          onClick={() => reactionCompleted ? handleCompletedClick("캐릭터 반응 게임") : navigate("/reaction")}
-        >
-          {reactionCompleted && (
-            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
-              적립완료
-            </Badge>
-          )}
-          <CardHeader>
-            <div className="text-6xl mb-4 text-center">🎨</div>
-            <CardTitle className="text-2xl text-center">캐릭터 반응 게임</CardTitle>
-            <CardDescription className="text-center text-base">여우로 바뀔 때 빠르게 반응하세요!</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>⚡ 반응속도가 0.3초 보다 빠르면 리워드 적립!</p>
-              <p>🎯 반응속도 측정</p>
-              {avgReactionTime && (
-                <p className="text-primary font-semibold pt-2 border-t">
-                  📊 전체 평균: {(avgReactionTime / 1000).toFixed(2)}초
-                </p>
-              )}
-            </div>
-            <Button className="w-full mt-4" size="lg" disabled={reactionCompleted}>
-              {reactionCompleted ? "오늘 완료 ✓" : "플레이하기 →"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
-          onClick={() => gemCompleted ? handleCompletedClick("보석 캐기 챌린지") : navigate("/gem")}
-        >
-          {gemCompleted && (
-            <Badge className="absolute top-4 right-4 bg-green-500 hover:bg-green-600">
-              적립완료
-            </Badge>
-          )}
-          <CardHeader>
-            <div className="text-6xl mb-4 text-center">💎</div>
-            <CardTitle className="text-2xl text-center">보석 캐기 챌린지</CardTitle>
-            <CardDescription className="text-center text-base">20초 안에 돌을 깨고 보석을 캐내세요!</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>⏱️ 20초 시간 제한</p>
-              <p>🎯 120번 클릭 하면 보석획득!</p>
-              {avgClicks && (
-                <p className="text-primary font-semibold pt-2 border-t">
-                  📊 전체 평균: {Math.round(avgClicks)}회 클릭
-                </p>
-              )}
-            </div>
-            <Button className="w-full mt-4" size="lg" disabled={gemCompleted}>
-              {gemCompleted ? "오늘 완료 ✓" : "플레이하기 →"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card
-          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-2xl relative"
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
           onClick={() => navigate("/memory")}
         >
-          <CardHeader>
-            <div className="text-6xl mb-4 text-center">🧠</div>
-            <CardTitle className="text-2xl text-center">기억력 게임</CardTitle>
-            <CardDescription className="text-center text-base">같은 색상 카드를 찾아 매칭하세요!</CardDescription>
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">🤔</div>
+            <CardTitle className="text-xl">기억력 테스트</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2 text-sm text-muted-foreground">
-              <p>🎴 카드 매칭 게임</p>
-              <p>🎯 25회 이하 시도로 완료하면 리워드 적립!</p>
-              <p>🧩 8쌍의 카드 매칭</p>
-            </div>
-            <Button className="w-full mt-4" size="lg">
-              플레이하기 →
-            </Button>
-          </CardContent>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
+          onClick={() => navigate("/memory")}
+        >
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">🃏</div>
+            <CardTitle className="text-xl">카드 짝맞추기</CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
+          onClick={() => navigate("/reaction")}
+        >
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">🎨</div>
+            <CardTitle className="text-xl">색깔 맞추기</CardTitle>
+          </CardHeader>
+        </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
+          onClick={() => navigate("/reaction")}
+        >
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">⏱️</div>
+            <CardTitle className="text-xl">빨리 맞추기</CardTitle>
+          </CardHeader>
         </Card>
       </div>
-
-      
     </div>
   );
 };
