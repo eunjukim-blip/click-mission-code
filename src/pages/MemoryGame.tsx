@@ -213,9 +213,6 @@ const MemoryGame = () => {
               ⏱️ {timeLeft}초
             </span>
           </div>
-          <p className="text-sm text-primary font-semibold mt-2">
-            ⚡ {currentConfig.time}초 안에 완료하세요!
-          </p>
         </div>
 
         {!gameOver && !roundComplete ? (
