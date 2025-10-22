@@ -50,7 +50,7 @@ const MemoryGame = () => {
   const roundConfigs = [
     { round: 1, pairs: 2, gridCols: 2, time: 10 }, // 4개 카드, 10초
     { round: 2, pairs: 4, gridCols: 4, time: 20 }, // 8개 카드, 20초
-    { round: 3, pairs: 8, gridCols: 4, time: 25 }, // 16개 카드, 25초
+    { round: 3, pairs: 8, gridCols: 4, time: 30 }, // 16개 카드, 30초
   ];
 
   const currentConfig = roundConfigs[currentRound - 1];
@@ -159,20 +159,15 @@ const MemoryGame = () => {
       
       if (currentRound === 3) {
         // 최종 라운드 완료
-        const success = attempts <= 15;
         supabase
           .from("memory_game_results")
           .insert({
             attempts,
             time_taken: currentConfig.time - timeLeft,
-            success,
+            success: true,
           })
           .then(() => {
-            if (success) {
-              toast.success("🎉 전체 게임 완료! 리워드 적립!");
-            } else {
-              toast.success("🎉 전체 게임 완료!");
-            }
+            toast.success("🎉 전체 게임 완료! 리워드 적립!");
           });
       } else {
         toast.success(`🎉 라운드 ${currentRound} 완료!`);
@@ -219,7 +214,7 @@ const MemoryGame = () => {
             </span>
           </div>
           <p className="text-sm text-primary font-semibold mt-2">
-            ⚡ {currentConfig.time}초 안에 완료하세요! (전체 15회 이하로 완료하면 리워드!)
+            ⚡ {currentConfig.time}초 안에 완료하세요!
           </p>
         </div>
 
@@ -272,6 +267,14 @@ const MemoryGame = () => {
           </div>
         ) : gameOver ? (
           <div className="text-center space-y-6">
+            {/* Google AdSense 배너 */}
+            <div className="w-full max-w-md mx-auto bg-secondary/30 p-4 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-2">광고</p>
+              <div className="h-20 flex items-center justify-center bg-background/50 rounded">
+                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
+              </div>
+            </div>
+
             <div className="text-6xl mb-4">😢</div>
             <h2 className="text-3xl font-bold text-foreground">
               게임 오버
@@ -293,9 +296,7 @@ const MemoryGame = () => {
               </div>
             </div>
 
-            <div className="text-6xl mb-4">
-              {attempts <= 15 ? "🎉" : "✨"}
-            </div>
+            <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-foreground">
               전체 게임 완료!
             </h2>
@@ -303,15 +304,9 @@ const MemoryGame = () => {
               <p className="text-xl text-muted-foreground">
                 총 {attempts}회 시도
               </p>
-              {attempts <= 15 ? (
-                <p className="text-xl text-primary font-bold">
-                  🎁 리워드 적립 완료!
-                </p>
-              ) : (
-                <p className="text-lg text-muted-foreground">
-                  15회 이하로 도전해보세요!
-                </p>
-              )}
+              <p className="text-xl text-primary font-bold">
+                🎁 리워드 적립 완료!
+              </p>
             </div>
             <div className="flex gap-4 justify-center">
               <Button onClick={resetGame} size="lg">
