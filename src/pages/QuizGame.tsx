@@ -33,6 +33,36 @@ const QuizGame = () => {
   const [gameFinished, setGameFinished] = useState(false);
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [canRetry, setCanRetry] = useState(true);
+
+  useEffect(() => {
+    checkRetryLimit();
+  }, []);
+
+  const checkRetryLimit = () => {
+    const today = new Date().toDateString();
+    const savedDate = localStorage.getItem('quiz_retry_date');
+    const savedCount = localStorage.getItem('quiz_retry_count');
+
+    if (savedDate !== today) {
+      localStorage.setItem('quiz_retry_date', today);
+      localStorage.setItem('quiz_retry_count', '0');
+      setRetryCount(0);
+      setCanRetry(true);
+    } else {
+      const count = parseInt(savedCount || '0');
+      setRetryCount(count);
+      setCanRetry(count < 3);
+    }
+  };
+
+  const handleRetry = () => {
+    const count = retryCount + 1;
+    localStorage.setItem('quiz_retry_count', count.toString());
+    setRetryCount(count);
+    window.location.reload();
+  };
 
   useEffect(() => {
     loadQuiz();
@@ -178,8 +208,12 @@ const QuizGame = () => {
                   <div className="h-32 flex items-center justify-center bg-background/50 rounded mb-3">
                     <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
                   </div>
-                  <Button onClick={() => window.location.reload()} className="w-full">
-                    광고 보고 다시 풀기
+                  <Button 
+                    onClick={handleRetry} 
+                    className="w-full"
+                    disabled={!canRetry}
+                  >
+                    {canRetry ? `광고 보고 다시 풀기 (${3 - retryCount}회 남음)` : '오늘 재시도 횟수를 모두 사용했습니다'}
                   </Button>
                 </div>
               </>
