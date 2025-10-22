@@ -19,7 +19,7 @@ const Index = () => {
         >
           <CardHeader className="text-center pb-6 pt-8">
             <div className="text-5xl mb-4">🤔</div>
-            <CardTitle className="text-xl">기억력 테스트</CardTitle>
+            <CardTitle className="text-xl">카드맞추기</CardTitle>
           </CardHeader>
         </Card>
 
