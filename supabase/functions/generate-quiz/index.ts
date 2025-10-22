@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { date } = await req.json();
+    const { date, previousQuestions = [] } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -19,6 +19,11 @@ serve(async (req) => {
     }
 
     console.log("Generating quiz for date:", date);
+    console.log("Previous questions to exclude:", previousQuestions.length);
+
+    const excludeText = previousQuestions.length > 0 
+      ? `\n\n다음 문제들은 이미 출제되었으므로 절대 포함하지 마세요:\n${previousQuestions.map((q: string, i: number) => `${i + 1}. ${q}`).join('\n')}`
+      : '';
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -41,7 +46,7 @@ serve(async (req) => {
 - 최신 재테크 및 개인 재무 관리 트렌드 (예: 디지털 자산, 연금 개편 등)
 
 매번 다른 주제의 퀴즈를 생성하고, 최신 뉴스와 시장 동향을 반영해주세요.
-실생활에 유용하고 일반인이 알아두면 좋을 최신 금융/경제 정보 위주로 작성해주세요.`
+실생활에 유용하고 일반인이 알아두면 좋을 최신 금융/경제 정보 위주로 작성해주세요.${excludeText}`
           },
           {
             role: "user",

@@ -106,6 +106,7 @@ export type Database = {
           completion_date: string
           created_at: string
           id: string
+          question: string | null
           score: number
           user_identifier: string
         }
@@ -113,6 +114,7 @@ export type Database = {
           completion_date?: string
           created_at?: string
           id?: string
+          question?: string | null
           score: number
           user_identifier: string
         }
@@ -120,6 +122,7 @@ export type Database = {
           completion_date?: string
           created_at?: string
           id?: string
+          question?: string | null
           score?: number
           user_identifier?: string
         }

@@ -60,10 +60,25 @@ const QuizGame = () => {
     try {
       setLoading(true);
       const today = new Date().toDateString();
-      const uniqueId = Date.now(); // 매번 다른 퀴즈를 위한 타임스탬프
+      const uniqueId = Date.now();
+      
+      // 이전에 풀었던 문제들 조회
+      const userIdentifier = localStorage.getItem('user_id') || crypto.randomUUID();
+      localStorage.setItem('user_id', userIdentifier);
+      
+      const { data: previousData } = await supabase
+        .from('quiz_completions')
+        .select('question')
+        .eq('user_identifier', userIdentifier)
+        .not('question', 'is', null);
+      
+      const previousQuestions = previousData?.map(item => item.question) || [];
       
       const { data, error } = await supabase.functions.invoke('generate-quiz', {
-        body: { date: `${today}-${uniqueId}` }
+        body: { 
+          date: `${today}-${uniqueId}`,
+          previousQuestions 
+        }
       });
 
       if (error) {
@@ -119,7 +134,8 @@ const QuizGame = () => {
       await supabase.from('quiz_completions').insert({
         user_identifier: userIdentifier,
         score: finalScore,
-        completion_date: new Date().toISOString().split('T')[0]
+        completion_date: new Date().toISOString().split('T')[0],
+        question: questions[currentIndex].question
       });
     } catch (error) {
       console.error('Error saving completion:', error);
