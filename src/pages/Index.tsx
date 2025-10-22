@@ -18,7 +18,7 @@ const Index = () => {
           onClick={() => navigate("/memory")}
         >
           <CardHeader className="text-center pb-6 pt-8">
-            <div className="text-5xl mb-4">🤔</div>
+            <div className="text-5xl mb-4">🃏</div>
             <CardTitle className="text-xl">카드맞추기</CardTitle>
           </CardHeader>
         </Card>
@@ -39,7 +39,7 @@ const Index = () => {
         >
           <CardHeader className="text-center pb-6 pt-8">
             <div className="text-5xl mb-4">⏱️</div>
-            <CardTitle className="text-xl">클릭하기</CardTitle>
+            <CardTitle className="text-xl">클릭 빨리하기</CardTitle>
           </CardHeader>
         </Card>
       </div>
