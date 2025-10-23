@@ -106,6 +106,30 @@ export type Database = {
           },
         ]
       }
+      number_sequence_results: {
+        Row: {
+          created_at: string
+          id: string
+          level: number
+          time_taken: number
+          user_identifier: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          level: number
+          time_taken: number
+          user_identifier?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          level?: number
+          time_taken?: number
+          user_identifier?: string | null
+        }
+        Relationships: []
+      }
       offerwall_products: {
         Row: {
           category: string
