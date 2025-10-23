@@ -17,52 +17,63 @@ const ladderOptions: LadderOption[] = [
   { id: 1, label: "A", reward: 50, color: "from-pink-500 to-pink-600" },
   { id: 2, label: "B", reward: 100, color: "from-purple-500 to-purple-600" },
   { id: 3, label: "C", reward: 150, color: "from-blue-500 to-blue-600" },
-  { id: 4, label: "D", reward: 200, color: "from-cyan-500 to-cyan-600" },
-  { id: 5, label: "E", reward: 250, color: "from-green-500 to-green-600" },
-  { id: 6, label: "F", reward: 300, color: "from-yellow-500 to-yellow-600" },
-  { id: 7, label: "G", reward: 350, color: "from-orange-500 to-orange-600" },
-  { id: 8, label: "H", reward: 400, color: "from-red-500 to-red-600" },
+  { id: 4, label: "D", reward: 200, color: "from-green-500 to-green-600" },
+  { id: 5, label: "E", reward: 300, color: "from-orange-500 to-orange-600" },
 ];
 
-// 사다리 경로 생성 (각 시작점에서 끝점까지의 경로)
-const generateLadderPaths = () => {
-  const paths: number[][] = [
-    [0, 0, 1, 1, 0, 0, 1, 1, 2, 2, 1, 1, 0, 0, 1], // A -> 2
-    [1, 0, 0, 1, 1, 2, 2, 1, 1, 2, 2, 3, 3, 2, 2], // B -> 3
-    [2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3], // C -> 4
-    [3, 3, 4, 4, 3, 3, 4, 4, 5, 5, 5, 5, 6, 6, 5], // D -> 6
-    [4, 4, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 6], // E -> 7
-    [5, 5, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 6, 6, 7], // F -> 8
-    [6, 6, 7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 5, 5, 4], // G -> 5
-    [7, 7, 7, 7, 6, 6, 6, 6, 5, 5, 4, 4, 3, 3, 0], // H -> 1
-  ];
-  return paths;
+const LEVELS = 12; // 사다리 레벨 수
+const LANE_COUNT = 5; // 사다리 라인 수
+
+// 랜덤 사다리 경로 생성
+const generateRandomLadder = () => {
+  // 가로 연결선 생성 (랜덤)
+  const bars: { level: number; from: number; to: number }[] = [];
+  
+  for (let level = 1; level <= LEVELS; level++) {
+    // 각 레벨에서 1-2개의 가로줄을 생성
+    const barCount = Math.floor(Math.random() * 2) + 1;
+    const usedPositions = new Set<number>();
+    
+    for (let i = 0; i < barCount; i++) {
+      // 겹치지 않는 위치 찾기
+      let from: number;
+      do {
+        from = Math.floor(Math.random() * (LANE_COUNT - 1));
+      } while (usedPositions.has(from) || usedPositions.has(from + 1));
+      
+      usedPositions.add(from);
+      usedPositions.add(from + 1);
+      
+      bars.push({ level, from, to: from + 1 });
+    }
+  }
+  
+  // 각 시작점에서의 경로 계산
+  const paths: number[][] = [];
+  
+  for (let start = 0; start < LANE_COUNT; start++) {
+    const path: number[] = [start];
+    let currentPos = start;
+    
+    for (let level = 1; level <= LEVELS; level++) {
+      // 현재 레벨에서 이동 가능한 가로줄 찾기
+      const leftBar = bars.find(b => b.level === level && b.to === currentPos);
+      const rightBar = bars.find(b => b.level === level && b.from === currentPos);
+      
+      if (leftBar) {
+        currentPos = leftBar.from;
+      } else if (rightBar) {
+        currentPos = rightBar.to;
+      }
+      
+      path.push(currentPos);
+    }
+    
+    paths.push(path);
+  }
+  
+  return { paths, bars };
 };
-
-// 가로 연결선 정보 (level, from, to)
-const horizontalBars = [
-  { level: 1, from: 0, to: 1 },
-  { level: 2, from: 4, to: 5 },
-  { level: 3, from: 2, to: 3 },
-  { level: 3, from: 6, to: 7 },
-  { level: 4, from: 0, to: 1 },
-  { level: 4, from: 3, to: 4 },
-  { level: 5, from: 5, to: 6 },
-  { level: 6, from: 1, to: 2 },
-  { level: 6, from: 6, to: 7 },
-  { level: 7, from: 3, to: 4 },
-  { level: 8, from: 1, to: 2 },
-  { level: 8, from: 4, to: 5 },
-  { level: 9, from: 0, to: 1 },
-  { level: 9, from: 5, to: 6 },
-  { level: 10, from: 2, to: 3 },
-  { level: 10, from: 6, to: 7 },
-  { level: 11, from: 4, to: 5 },
-  { level: 12, from: 1, to: 2 },
-  { level: 12, from: 5, to: 6 },
-  { level: 13, from: 0, to: 1 },
-  { level: 13, from: 3, to: 4 },
-];
 
 export default function LadderGame() {
   const navigate = useNavigate();
@@ -72,7 +83,7 @@ export default function LadderGame() {
   const [gameResult, setGameResult] = useState<LadderOption | null>(null);
   const [animatingPath, setAnimatingPath] = useState<number[]>([]);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
-  const ladderPaths = generateLadderPaths();
+  const [ladderData, setLadderData] = useState(() => generateRandomLadder());
 
   const handleOptionSelect = (optionId: number) => {
     if (showResult) return;
@@ -99,7 +110,7 @@ export default function LadderGame() {
     setShowAdDialog(false);
     
     // 선택한 경로로 애니메이션 시작
-    const path = ladderPaths[selectedOption - 1];
+    const path = ladderData.paths[selectedOption - 1];
     setAnimatingPath(path);
     setCurrentPathIndex(0);
   };
@@ -136,6 +147,7 @@ export default function LadderGame() {
     setGameResult(null);
     setAnimatingPath([]);
     setCurrentPathIndex(0);
+    setLadderData(generateRandomLadder()); // 새로운 랜덤 사다리 생성
   };
 
   return (
@@ -163,10 +175,11 @@ export default function LadderGame() {
             <div>
               <h2 className="font-bold text-lg mb-2">게임 방법</h2>
               <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• 8개의 사다리 중 하나를 선택하세요</li>
+                <li>• 5개의 사다리 중 하나를 선택하세요</li>
                 <li>• 광고 시청 후 결과가 공개됩니다</li>
-                <li>• 선택한 사다리의 보상을 획득할 수 있습니다</li>
-                <li>• 보상: 50P ~ 400P</li>
+                <li>• 선택한 사다리를 따라 내려가 도착한 보상을 받습니다</li>
+                <li>• 매 게임마다 사다리가 랜덤으로 생성됩니다</li>
+                <li>• 보상: 50P ~ 300P</li>
               </ul>
             </div>
           </div>
@@ -196,15 +209,15 @@ export default function LadderGame() {
             </div>
 
             {/* 사다리 그리기 */}
-            <svg className="w-full h-[500px] md:h-[600px]" viewBox="0 0 800 600">
+            <svg className="w-full h-[500px] md:h-[600px]" viewBox="0 0 600 550">
               {/* 세로 줄 */}
-              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => (
+              {[0, 1, 2, 3, 4].map((i) => (
                 <line
                   key={`v-${i}`}
-                  x1={50 + i * 100}
+                  x1={100 + i * 100}
                   y1={20}
-                  x2={50 + i * 100}
-                  y2={580}
+                  x2={100 + i * 100}
+                  y2={520}
                   stroke="hsl(var(--muted-foreground))"
                   strokeWidth="3"
                   opacity="0.3"
@@ -212,12 +225,12 @@ export default function LadderGame() {
               ))}
 
               {/* 가로 연결선 */}
-              {horizontalBars.map((bar, idx) => (
+              {ladderData.bars.map((bar, idx) => (
                 <line
                   key={`h-${idx}`}
-                  x1={50 + bar.from * 100}
+                  x1={100 + bar.from * 100}
                   y1={20 + bar.level * 40}
-                  x2={50 + bar.to * 100}
+                  x2={100 + bar.to * 100}
                   y2={20 + bar.level * 40}
                   stroke="hsl(var(--muted-foreground))"
                   strokeWidth="3"
@@ -234,9 +247,9 @@ export default function LadderGame() {
                     return (
                       <line
                         key={`path-${idx}`}
-                        x1={50 + prevPos * 100}
+                        x1={100 + prevPos * 100}
                         y1={20 + (idx - 1) * 40}
-                        x2={50 + pos * 100}
+                        x2={100 + pos * 100}
                         y2={20 + idx * 40}
                         stroke="hsl(var(--primary))"
                         strokeWidth="6"
@@ -246,7 +259,7 @@ export default function LadderGame() {
                   })}
                   {/* 현재 위치 마커 */}
                   <circle
-                    cx={50 + animatingPath[currentPathIndex] * 100}
+                    cx={100 + animatingPath[currentPathIndex] * 100}
                     cy={20 + currentPathIndex * 40}
                     r="8"
                     fill="hsl(var(--primary))"
