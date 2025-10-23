@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -23,10 +23,9 @@ const ladderOptions: LadderOption[] = [
 const LEVELS = 12; // 사다리 레벨 수
 const LANE_COUNT = 5; // 사다리 라인 수
 
-// 랜덤 보상 생성 (50P ~ 300P)
+// 랜덤 보상 생성 (50P ~ 300P) - 최적화됨
 const generateRandomRewards = () => {
   const rewards = [50, 100, 150, 200, 300];
-  // Fisher-Yates 셔플 알고리즘으로 랜덤 섞기
   for (let i = rewards.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [rewards[i], rewards[j]] = [rewards[j], rewards[i]];
@@ -34,18 +33,15 @@ const generateRandomRewards = () => {
   return rewards;
 };
 
-// 랜덤 사다리 경로 생성
+// 랜덤 사다리 경로 생성 - 최적화됨
 const generateRandomLadder = () => {
-  // 가로 연결선 생성 (랜덤)
   const bars: { level: number; from: number; to: number }[] = [];
   
   for (let level = 1; level <= LEVELS; level++) {
-    // 각 레벨에서 1-2개의 가로줄을 생성
     const barCount = Math.floor(Math.random() * 2) + 1;
     const usedPositions = new Set<number>();
     
     for (let i = 0; i < barCount; i++) {
-      // 겹치지 않는 위치 찾기
       let from: number;
       do {
         from = Math.floor(Math.random() * (LANE_COUNT - 1));
@@ -53,12 +49,10 @@ const generateRandomLadder = () => {
       
       usedPositions.add(from);
       usedPositions.add(from + 1);
-      
       bars.push({ level, from, to: from + 1 });
     }
   }
   
-  // 각 시작점에서의 경로 계산
   const paths: number[][] = [];
   
   for (let start = 0; start < LANE_COUNT; start++) {
@@ -66,7 +60,6 @@ const generateRandomLadder = () => {
     let currentPos = start;
     
     for (let level = 1; level <= LEVELS; level++) {
-      // 현재 레벨에서 이동 가능한 가로줄 찾기
       const leftBar = bars.find(b => b.level === level && b.to === currentPos);
       const rightBar = bars.find(b => b.level === level && b.from === currentPos);
       
@@ -93,8 +86,11 @@ export default function LadderGame() {
   const [gameResult, setGameResult] = useState<{ reward: number; finalPosition: number } | null>(null);
   const [animatingPath, setAnimatingPath] = useState<Array<{ x: number; y: number }>>([]);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
-  const [ladderData, setLadderData] = useState(() => generateRandomLadder());
-  const [rewards, setRewards] = useState(() => generateRandomRewards());
+  const [resetKey, setResetKey] = useState(0);
+  
+  // useMemo로 사다리와 보상을 메모이제이션하여 불필요한 재생성 방지
+  const ladderData = useMemo(() => generateRandomLadder(), [resetKey]);
+  const rewards = useMemo(() => generateRandomRewards(), [resetKey]);
 
   const handleOptionSelect = (optionId: number) => {
     if (showResult) return;
@@ -181,8 +177,7 @@ export default function LadderGame() {
     setGameResult(null);
     setAnimatingPath([]);
     setCurrentPathIndex(0);
-    setLadderData(generateRandomLadder()); // 새로운 랜덤 사다리 생성
-    setRewards(generateRandomRewards()); // 새로운 랜덤 보상 생성
+    setResetKey(prev => prev + 1); // resetKey 변경으로 새로운 사다리와 보상 생성
   };
 
   return (
