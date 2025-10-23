@@ -157,25 +157,26 @@ const NumberSequenceGame = () => {
   }, [showRewards]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-orange-300 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-orange-300 p-2 md:p-4">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-2 md:gap-4 mb-4">
           <Button
             onClick={() => navigate("/")}
             variant="outline"
-            className="bg-white/80"
+            className="bg-white/80 w-full md:w-auto text-sm md:text-base"
+            size="sm"
           >
-            <ArrowLeft className="mr-2 h-4 w-4" />
+            <ArrowLeft className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
             홈으로
           </Button>
-          <h1 className="text-3xl font-bold text-white drop-shadow-lg">
+          <h1 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg">
             숫자 순서 게임
           </h1>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full md:w-auto">
             <Dialog open={showRankings} onOpenChange={setShowRankings}>
               <DialogTrigger asChild>
-                <Button variant="outline" className="bg-white/80">
-                  <Trophy className="mr-2 h-4 w-4" />
+                <Button variant="outline" className="bg-white/80 flex-1 md:flex-none text-sm md:text-base" size="sm">
+                  <Trophy className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
                   랭킹
                 </Button>
               </DialogTrigger>
@@ -243,8 +244,8 @@ const NumberSequenceGame = () => {
 
           <Dialog open={showRewards} onOpenChange={setShowRewards}>
             <DialogTrigger asChild>
-              <Button variant="outline" className="bg-white/80">
-                <Gift className="mr-2 h-4 w-4" />
+              <Button variant="outline" className="bg-white/80 flex-1 md:flex-none text-sm md:text-base" size="sm">
+                <Gift className="mr-1 md:mr-2 h-3 w-3 md:h-4 md:w-4" />
                 내 리워드
               </Button>
             </DialogTrigger>
@@ -337,7 +338,7 @@ const NumberSequenceGame = () => {
                 다음 숫자: <span className="text-primary text-3xl">{currentNumber}</span>
               </p>
             </Card>
-            <div className="relative h-[600px] bg-white/30 rounded-lg border-4 border-white/50">
+            <div className="relative h-[400px] md:h-[500px] bg-white/30 rounded-lg border-4 border-white/50">
               {numbers.map((num) => (
                 <button
                   key={num.number}
