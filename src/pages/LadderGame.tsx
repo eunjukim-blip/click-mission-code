@@ -9,20 +9,30 @@ import { ArrowLeft, Gift } from "lucide-react";
 interface LadderOption {
   id: number;
   label: string;
-  reward: number;
   color: string;
 }
 
 const ladderOptions: LadderOption[] = [
-  { id: 1, label: "A", reward: 50, color: "from-pink-500 to-pink-600" },
-  { id: 2, label: "B", reward: 100, color: "from-purple-500 to-purple-600" },
-  { id: 3, label: "C", reward: 150, color: "from-blue-500 to-blue-600" },
-  { id: 4, label: "D", reward: 200, color: "from-green-500 to-green-600" },
-  { id: 5, label: "E", reward: 300, color: "from-orange-500 to-orange-600" },
+  { id: 1, label: "A", color: "from-pink-500 to-pink-600" },
+  { id: 2, label: "B", color: "from-purple-500 to-purple-600" },
+  { id: 3, label: "C", color: "from-blue-500 to-blue-600" },
+  { id: 4, label: "D", color: "from-green-500 to-green-600" },
+  { id: 5, label: "E", color: "from-orange-500 to-orange-600" },
 ];
 
 const LEVELS = 12; // 사다리 레벨 수
 const LANE_COUNT = 5; // 사다리 라인 수
+
+// 랜덤 보상 생성 (50P ~ 300P)
+const generateRandomRewards = () => {
+  const rewards = [50, 100, 150, 200, 300];
+  // Fisher-Yates 셔플 알고리즘으로 랜덤 섞기
+  for (let i = rewards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rewards[i], rewards[j]] = [rewards[j], rewards[i]];
+  }
+  return rewards;
+};
 
 // 랜덤 사다리 경로 생성
 const generateRandomLadder = () => {
@@ -80,10 +90,11 @@ export default function LadderGame() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showAdDialog, setShowAdDialog] = useState(false);
-  const [gameResult, setGameResult] = useState<LadderOption | null>(null);
+  const [gameResult, setGameResult] = useState<{ reward: number; path: number[] } | null>(null);
   const [animatingPath, setAnimatingPath] = useState<number[]>([]);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
   const [ladderData, setLadderData] = useState(() => generateRandomLadder());
+  const [rewards, setRewards] = useState(() => generateRandomRewards());
 
   const handleOptionSelect = (optionId: number) => {
     if (showResult) return;
@@ -127,19 +138,19 @@ export default function LadderGame() {
     } else {
       // 애니메이션 완료 후 결과 표시
       const finalPosition = animatingPath[animatingPath.length - 1];
-      const result = ladderOptions[finalPosition];
+      const reward = rewards[finalPosition];
       
       setTimeout(() => {
-        setGameResult(result);
+        setGameResult({ reward, path: animatingPath });
         setShowResult(true);
         
         toast({
           title: "축하합니다! 🎉",
-          description: `${result.reward} 포인트를 획득했습니다!`,
+          description: `${reward} 포인트를 획득했습니다!`,
         });
       }, 500);
     }
-  }, [currentPathIndex, animatingPath]);
+  }, [currentPathIndex, animatingPath, rewards]);
 
   const handleReset = () => {
     setSelectedOption(null);
@@ -148,6 +159,7 @@ export default function LadderGame() {
     setAnimatingPath([]);
     setCurrentPathIndex(0);
     setLadderData(generateRandomLadder()); // 새로운 랜덤 사다리 생성
+    setRewards(generateRandomRewards()); // 새로운 랜덤 보상 생성
   };
 
   return (
@@ -263,21 +275,28 @@ export default function LadderGame() {
 
             {/* 하단 보상 표시 */}
             <div className="flex justify-around mt-2">
-              {ladderOptions.map((option, idx) => (
+              {rewards.map((reward, idx) => (
                 <div
-                  key={option.id}
+                  key={idx}
                   className={`
                     w-10 h-10 md:w-12 md:h-12 rounded-lg font-bold text-white
-                    flex flex-col items-center justify-center text-xs
-                    bg-gradient-to-br ${option.color}
-                    ${showResult && gameResult?.id === option.id ? 'ring-4 ring-primary scale-110' : ''}
+                    flex flex-col items-center justify-center text-[10px]
+                    ${idx === 0 ? 'bg-gradient-to-br from-pink-500 to-pink-600' : ''}
+                    ${idx === 1 ? 'bg-gradient-to-br from-purple-500 to-purple-600' : ''}
+                    ${idx === 2 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : ''}
+                    ${idx === 3 ? 'bg-gradient-to-br from-green-500 to-green-600' : ''}
+                    ${idx === 4 ? 'bg-gradient-to-br from-orange-500 to-orange-600' : ''}
+                    ${showResult && gameResult && animatingPath[animatingPath.length - 1] === idx ? 'ring-4 ring-primary scale-110' : ''}
                     transition-all duration-300
                   `}
                 >
                   {showResult ? (
-                    <div className="text-sm md:text-base">{idx + 1}</div>
+                    <>
+                      <div className="text-sm md:text-base">{reward}</div>
+                      <div className="text-[8px]">P</div>
+                    </>
                   ) : (
-                    <div className="text-xl">?</div>
+                    <div className="text-lg">?</div>
                   )}
                 </div>
               ))}
@@ -289,13 +308,10 @@ export default function LadderGame() {
         {showResult && gameResult && (
           <Card className="p-4 mb-2 bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary">
             <div className="text-center">
-              <h3 className="text-lg font-bold mb-1">결과</h3>
-              <div className="text-2xl font-bold text-primary mb-1">
-                {gameResult.reward}P
+              <h3 className="text-lg font-bold mb-1">축하합니다!</h3>
+              <div className="text-2xl font-bold text-primary">
+                {gameResult.reward}P 획득
               </div>
-              <p className="text-xs text-muted-foreground">
-                {gameResult.label} 사다리 선택
-              </p>
             </div>
           </Card>
         )}
