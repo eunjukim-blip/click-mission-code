@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Play, RotateCcw, Trophy } from "lucide-react";
+import { ArrowLeft, Play, RotateCcw, Trophy, Gift } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 
 interface NumberBox {
   number: number;
@@ -21,6 +22,15 @@ interface RankingEntry {
   created_at: string;
 }
 
+interface RewardEntry {
+  id: string;
+  ranking_date: string;
+  rank: number;
+  level: number;
+  time_taken: number;
+  reward_amount: number;
+}
+
 const NumberSequenceGame = () => {
   const navigate = useNavigate();
   const [gameState, setGameState] = useState<"idle" | "playing" | "finished">("idle");
@@ -32,6 +42,8 @@ const NumberSequenceGame = () => {
   const [rankings, setRankings] = useState<RankingEntry[]>([]);
   const [showRankings, setShowRankings] = useState(false);
   const [rankingLevel, setRankingLevel] = useState(5);
+  const [myRewards, setMyRewards] = useState<RewardEntry[]>([]);
+  const [showRewards, setShowRewards] = useState(false);
 
   const generateNumbers = () => {
     const newNumbers: NumberBox[] = [];
@@ -85,6 +97,23 @@ const NumberSequenceGame = () => {
     }
   };
 
+  const fetchMyRewards = async () => {
+    try {
+      const userIdentifier = localStorage.getItem("userIdentifier") || "anonymous";
+      const { data, error } = await supabase
+        .from("daily_ranking_rewards")
+        .select("*")
+        .eq("user_identifier", userIdentifier)
+        .order("ranking_date", { ascending: false });
+
+      if (error) throw error;
+      setMyRewards(data || []);
+    } catch (error) {
+      console.error("Error fetching rewards:", error);
+      toast.error("리워드를 불러올 수 없습니다");
+    }
+  };
+
   const handleNumberClick = (number: number) => {
     if (gameState !== "playing") return;
 
@@ -121,6 +150,12 @@ const NumberSequenceGame = () => {
     }
   }, [showRankings, rankingLevel]);
 
+  useEffect(() => {
+    if (showRewards) {
+      fetchMyRewards();
+    }
+  }, [showRewards]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-400 via-pink-300 to-orange-300 p-4">
       <div className="max-w-6xl mx-auto">
@@ -136,13 +171,14 @@ const NumberSequenceGame = () => {
           <h1 className="text-3xl font-bold text-white drop-shadow-lg">
             숫자 순서 게임
           </h1>
-          <Dialog open={showRankings} onOpenChange={setShowRankings}>
-            <DialogTrigger asChild>
-              <Button variant="outline" className="bg-white/80">
-                <Trophy className="mr-2 h-4 w-4" />
-                랭킹
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Dialog open={showRankings} onOpenChange={setShowRankings}>
+              <DialogTrigger asChild>
+                <Button variant="outline" className="bg-white/80">
+                  <Trophy className="mr-2 h-4 w-4" />
+                  랭킹
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>랭킹 TOP 10</DialogTitle>
@@ -204,6 +240,66 @@ const NumberSequenceGame = () => {
               </ScrollArea>
             </DialogContent>
           </Dialog>
+
+          <Dialog open={showRewards} onOpenChange={setShowRewards}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="bg-white/80">
+                <Gift className="mr-2 h-4 w-4" />
+                내 리워드
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>내 리워드 내역</DialogTitle>
+              </DialogHeader>
+              <ScrollArea className="h-96">
+                {myRewards.length === 0 ? (
+                  <div className="text-center py-8 space-y-2">
+                    <p className="text-muted-foreground">
+                      아직 받은 리워드가 없습니다
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      매일 레벨별 상위 5명에게 리워드를 지급합니다!
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {myRewards.map((reward) => (
+                      <Card key={reward.id} className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <Badge
+                                variant={reward.rank === 1 ? "default" : "secondary"}
+                              >
+                                {reward.rank}위
+                              </Badge>
+                              <span className="text-sm font-medium">
+                                레벨 {reward.level}
+                              </span>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {reward.ranking_date} 달성
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              기록: {reward.time_taken}초
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold text-primary">
+                              {reward.reward_amount.toLocaleString()}
+                            </p>
+                            <p className="text-xs text-muted-foreground">포인트</p>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </DialogContent>
+          </Dialog>
+        </div>
         </div>
 
         {gameState === "idle" && (

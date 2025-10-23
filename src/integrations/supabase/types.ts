@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_ranking_rewards: {
+        Row: {
+          created_at: string | null
+          id: string
+          level: number
+          rank: number
+          ranking_date: string
+          reward_amount: number
+          rewarded_at: string | null
+          time_taken: number
+          user_identifier: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          level: number
+          rank: number
+          ranking_date: string
+          reward_amount: number
+          rewarded_at?: string | null
+          time_taken: number
+          user_identifier: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          level?: number
+          rank?: number
+          ranking_date?: string
+          reward_amount?: number
+          rewarded_at?: string | null
+          time_taken?: number
+          user_identifier?: string
+        }
+        Relationships: []
+      }
       gem_game_results: {
         Row: {
           clicks: number
