@@ -37,19 +37,32 @@ const MissionCenter = () => {
     await Promise.all([
       loadProducts(),
       loadParticipations(),
-      loadProfile()
+      loadProfile(session.user.id)
     ]);
     setLoading(false);
   };
 
-  const loadProfile = async () => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('total_points')
-      .single();
-    
-    if (data) {
-      setTotalPoints(data.total_points);
+  const loadProfile = async (uid: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('total_points')
+        .eq('id', uid)
+        .single();
+
+      if (error) {
+        // 프로필이 없을 수도 있으니 0으로 초기화하고 진행
+        setTotalPoints(0);
+        return;
+      }
+
+      if (data) {
+        setTotalPoints(data.total_points);
+      } else {
+        setTotalPoints(0);
+      }
+    } catch (e) {
+      setTotalPoints(0);
     }
   };
 
