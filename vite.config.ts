@@ -27,11 +27,5 @@ export default defineConfig(({ mode }) => ({
       },
     },
     chunkSizeWarningLimit: 1000,
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // 프로덕션에서 콘솔 로그 제거
-      },
-    },
   },
 }));
