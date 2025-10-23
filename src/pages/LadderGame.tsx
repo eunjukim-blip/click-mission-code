@@ -90,8 +90,8 @@ export default function LadderGame() {
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [showAdDialog, setShowAdDialog] = useState(false);
-  const [gameResult, setGameResult] = useState<{ reward: number; path: number[] } | null>(null);
-  const [animatingPath, setAnimatingPath] = useState<number[]>([]);
+  const [gameResult, setGameResult] = useState<{ reward: number; finalPosition: number } | null>(null);
+  const [animatingPath, setAnimatingPath] = useState<Array<{ x: number; y: number }>>([]);
   const [currentPathIndex, setCurrentPathIndex] = useState(0);
   const [ladderData, setLadderData] = useState(() => generateRandomLadder());
   const [rewards, setRewards] = useState(() => generateRandomRewards());
@@ -120,9 +120,32 @@ export default function LadderGame() {
     
     setShowAdDialog(false);
     
-    // 선택한 경로로 애니메이션 시작
-    const path = ladderData.paths[selectedOption - 1];
-    setAnimatingPath(path);
+    // 선택한 경로를 세로-가로 이동으로 분리
+    const originalPath = ladderData.paths[selectedOption - 1];
+    const detailedPath: Array<{ x: number; y: number }> = [];
+    
+    for (let i = 0; i < originalPath.length; i++) {
+      const currentX = originalPath[i];
+      const currentY = i;
+      
+      if (i === 0) {
+        // 시작점
+        detailedPath.push({ x: currentX, y: currentY });
+      } else {
+        const prevX = originalPath[i - 1];
+        
+        if (currentX !== prevX) {
+          // 가로 이동이 있는 경우: 현재 레벨에서 가로로 먼저 이동
+          detailedPath.push({ x: prevX, y: currentY });
+          detailedPath.push({ x: currentX, y: currentY });
+        } else {
+          // 세로로만 이동
+          detailedPath.push({ x: currentX, y: currentY });
+        }
+      }
+    }
+    
+    setAnimatingPath(detailedPath);
     setCurrentPathIndex(0);
   };
 
@@ -133,15 +156,15 @@ export default function LadderGame() {
     if (currentPathIndex < animatingPath.length - 1) {
       const timer = setTimeout(() => {
         setCurrentPathIndex(currentPathIndex + 1);
-      }, 200);
+      }, 150);
       return () => clearTimeout(timer);
     } else {
       // 애니메이션 완료 후 결과 표시
-      const finalPosition = animatingPath[animatingPath.length - 1];
+      const finalPosition = animatingPath[animatingPath.length - 1].x;
       const reward = rewards[finalPosition];
       
       setTimeout(() => {
-        setGameResult({ reward, path: animatingPath });
+        setGameResult({ reward, finalPosition });
         setShowResult(true);
         
         toast({
@@ -245,16 +268,16 @@ export default function LadderGame() {
               {/* 애니메이션 경로 */}
               {animatingPath.length > 0 && (
                 <>
-                  {animatingPath.slice(0, currentPathIndex + 1).map((pos, idx) => {
+                  {animatingPath.slice(0, currentPathIndex + 1).map((point, idx) => {
                     if (idx === 0) return null;
-                    const prevPos = animatingPath[idx - 1];
+                    const prevPoint = animatingPath[idx - 1];
                     return (
                       <line
                         key={`path-${idx}`}
-                        x1={100 + prevPos * 100}
-                        y1={20 + (idx - 1) * 40}
-                        x2={100 + pos * 100}
-                        y2={20 + idx * 40}
+                        x1={100 + prevPoint.x * 100}
+                        y1={20 + prevPoint.y * 40}
+                        x2={100 + point.x * 100}
+                        y2={20 + point.y * 40}
                         stroke="hsl(var(--primary))"
                         strokeWidth="6"
                         strokeLinecap="round"
@@ -263,8 +286,8 @@ export default function LadderGame() {
                   })}
                   {/* 현재 위치 마커 */}
                   <circle
-                    cx={100 + animatingPath[currentPathIndex] * 100}
-                    cy={20 + currentPathIndex * 40}
+                    cx={100 + animatingPath[currentPathIndex].x * 100}
+                    cy={20 + animatingPath[currentPathIndex].y * 40}
                     r="8"
                     fill="hsl(var(--primary))"
                     className="animate-pulse"
@@ -286,7 +309,7 @@ export default function LadderGame() {
                     ${idx === 2 ? 'bg-gradient-to-br from-blue-500 to-blue-600' : ''}
                     ${idx === 3 ? 'bg-gradient-to-br from-green-500 to-green-600' : ''}
                     ${idx === 4 ? 'bg-gradient-to-br from-orange-500 to-orange-600' : ''}
-                    ${showResult && gameResult && animatingPath[animatingPath.length - 1] === idx ? 'ring-4 ring-primary scale-110' : ''}
+                    ${showResult && gameResult && gameResult.finalPosition === idx ? 'ring-4 ring-primary scale-110' : ''}
                     transition-all duration-300
                   `}
                 >
