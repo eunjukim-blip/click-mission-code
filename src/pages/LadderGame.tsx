@@ -151,52 +151,44 @@ export default function LadderGame() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-2 md:p-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-2 md:p-4 flex flex-col">
+      <div className="max-w-4xl mx-auto w-full flex flex-col h-full">
         {/* Header */}
-        <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate("/")}
-              className="shrink-0"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-            <h1 className="text-xl md:text-3xl font-bold text-foreground">사다리 게임</h1>
-          </div>
+        <div className="flex items-center justify-between mb-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate("/")}
+            className="shrink-0"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg md:text-2xl font-bold text-foreground">사다리 게임</h1>
+          <div className="w-10" />
         </div>
 
-        {/* Game Description */}
-        <Card className="p-4 mb-6 bg-card/50 backdrop-blur-sm">
-          <div className="flex items-start gap-3">
-            <Gift className="h-6 w-6 text-primary shrink-0 mt-1" />
-            <div>
-              <h2 className="font-bold text-lg mb-2">게임 방법</h2>
-              <ul className="text-sm text-muted-foreground space-y-1">
-                <li>• 5개의 사다리 중 하나를 선택하세요</li>
-                <li>• 광고 시청 후 결과가 공개됩니다</li>
-                <li>• 선택한 사다리를 따라 내려가 도착한 보상을 받습니다</li>
-                <li>• 매 게임마다 사다리가 랜덤으로 생성됩니다</li>
-                <li>• 보상: 50P ~ 300P</li>
-              </ul>
-            </div>
+        {/* Game Description - Compact */}
+        <Card className="p-3 mb-2 bg-card/50 backdrop-blur-sm">
+          <div className="flex items-center gap-2">
+            <Gift className="h-5 w-5 text-primary shrink-0" />
+            <p className="text-xs text-muted-foreground">
+              사다리 선택 → 광고 시청 → 보상 획득 (50P~300P)
+            </p>
           </div>
         </Card>
 
         {/* Ladder Visualization */}
-        <Card className="p-4 mb-6 bg-card/50 backdrop-blur-sm">
-          <div className="relative">
+        <Card className="p-2 md:p-4 mb-2 bg-card/50 backdrop-blur-sm flex-1 flex flex-col min-h-0">
+          <div className="relative flex flex-col h-full">
             {/* 상단 시작점 선택 */}
-            <div className="flex justify-around mb-4">
+            <div className="flex justify-around mb-2">
               {ladderOptions.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => handleOptionSelect(option.id)}
                   disabled={showResult || animatingPath.length > 0}
                   className={`
-                    w-8 h-8 md:w-12 md:h-12 rounded-lg font-bold text-white text-sm md:text-base
+                    w-10 h-10 md:w-12 md:h-12 rounded-lg font-bold text-white text-sm
                     transition-all duration-300 flex items-center justify-center
                     ${selectedOption === option.id ? 'ring-4 ring-primary scale-110' : 'hover:scale-105'}
                     ${showResult || animatingPath.length > 0 ? 'cursor-default' : 'cursor-pointer'}
@@ -209,7 +201,7 @@ export default function LadderGame() {
             </div>
 
             {/* 사다리 그리기 */}
-            <svg className="w-full h-[500px] md:h-[600px]" viewBox="0 0 600 550">
+            <svg className="w-full flex-1" viewBox="0 0 600 550" preserveAspectRatio="xMidYMid meet">
               {/* 세로 줄 */}
               {[0, 1, 2, 3, 4].map((i) => (
                 <line
@@ -270,24 +262,22 @@ export default function LadderGame() {
             </svg>
 
             {/* 하단 보상 표시 */}
-            <div className="flex justify-around mt-4">
+            <div className="flex justify-around mt-2">
               {ladderOptions.map((option, idx) => (
                 <div
                   key={option.id}
                   className={`
-                    w-8 h-8 md:w-12 md:h-12 rounded-lg font-bold text-white
-                    flex flex-col items-center justify-center text-[10px] md:text-xs
+                    w-10 h-10 md:w-12 md:h-12 rounded-lg font-bold text-white
+                    flex flex-col items-center justify-center text-xs
                     bg-gradient-to-br ${option.color}
                     ${showResult && gameResult?.id === option.id ? 'ring-4 ring-primary scale-110' : ''}
                     transition-all duration-300
                   `}
                 >
                   {showResult ? (
-                    <>
-                      <div className="text-sm md:text-lg">{idx + 1}</div>
-                    </>
+                    <div className="text-sm md:text-base">{idx + 1}</div>
                   ) : (
-                    <div className="text-lg md:text-2xl">{idx + 1}</div>
+                    <div className="text-xl">?</div>
                   )}
                 </div>
               ))}
@@ -297,34 +287,34 @@ export default function LadderGame() {
 
         {/* Result Display */}
         {showResult && gameResult && (
-          <Card className="p-6 mb-6 bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary">
+          <Card className="p-4 mb-2 bg-gradient-to-br from-primary/10 to-secondary/10 border-2 border-primary">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">결과</h3>
-              <div className="text-4xl font-bold text-primary mb-2">
-                {gameResult.reward} 포인트
+              <h3 className="text-lg font-bold mb-1">결과</h3>
+              <div className="text-2xl font-bold text-primary mb-1">
+                {gameResult.reward}P
               </div>
-              <p className="text-muted-foreground">
-                {gameResult.label} 사다리를 선택하셨습니다!
+              <p className="text-xs text-muted-foreground">
+                {gameResult.label} 사다리 선택
               </p>
             </div>
           </Card>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-4">
+        <div className="flex gap-2 pb-2">
           {!showResult ? (
             <Button
               onClick={handleStartGame}
               disabled={selectedOption === null}
-              className="w-full text-lg py-6"
+              className="w-full py-5"
               size="lg"
             >
-              광고 보고 결과 확인하기
+              광고 보고 결과 확인
             </Button>
           ) : (
             <Button
               onClick={handleReset}
-              className="w-full text-lg py-6"
+              className="w-full py-5"
               size="lg"
               variant="outline"
             >
