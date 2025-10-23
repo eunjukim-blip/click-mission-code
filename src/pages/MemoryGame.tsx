@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AdSenseBanner } from "@/components/ads/AdSenseBanner";
+import { RewardedVideoAd } from "@/components/ads/RewardedVideoAd";
 import blueCharacter from "@/assets/character-blue.png";
 import redCharacter from "@/assets/character-red.png";
 import greenCharacter from "@/assets/character-green.png";
@@ -46,6 +48,7 @@ const MemoryGame = () => {
   const [timeLeft, setTimeLeft] = useState(30);
   const [roundComplete, setRoundComplete] = useState(false);
   const [gameOver, setGameOver] = useState(false);
+  const [showRewardedAd, setShowRewardedAd] = useState(false);
 
   const roundConfigs = [
     { round: 1, pairs: 2, gridCols: 2, time: 10 }, // 4개 카드, 10초
@@ -176,15 +179,15 @@ const MemoryGame = () => {
   }, [matchedPairs, currentConfig.pairs, roundComplete, gameOver, currentRound, attempts, timeLeft]);
 
   const handleNextRound = () => {
-    // RV 광고 플레이스홀더 (실제 광고 SDK 연동 필요)
-    console.log("RV 광고 재생 필요");
-    toast.info("광고 시청 후 다음 라운드로 진행됩니다");
-    
-    // 광고 시청 시뮬레이션 후 다음 라운드로
-    setTimeout(() => {
-      setCurrentRound(prev => prev + 1);
-      initializeRound(currentRound + 1);
-    }, 1000);
+    // 보상형 비디오 광고 표시
+    setShowRewardedAd(true);
+  };
+
+  const handleAdRewardEarned = () => {
+    // 광고 시청 완료 후 다음 라운드로
+    setCurrentRound(prev => prev + 1);
+    initializeRound(currentRound + 1);
+    toast.success("광고 시청 완료! 다음 라운드 시작");
   };
 
   return (
@@ -244,12 +247,10 @@ const MemoryGame = () => {
         ) : roundComplete && currentRound < 3 ? (
           <div className="text-center space-y-6">
             {/* Google AdSense 배너 */}
-            <div className="w-full max-w-md mx-auto bg-secondary/30 p-4 rounded-lg text-center">
-              <p className="text-xs text-muted-foreground mb-2">광고</p>
-              <div className="h-20 flex items-center justify-center bg-background/50 rounded">
-                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
-              </div>
-            </div>
+            <AdSenseBanner 
+              adSlot="1234567890"
+              className="max-w-md mx-auto"
+            />
 
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-foreground">
@@ -265,12 +266,10 @@ const MemoryGame = () => {
         ) : gameOver ? (
           <div className="text-center space-y-6">
             {/* Google AdSense 배너 */}
-            <div className="w-full max-w-md mx-auto bg-secondary/30 p-4 rounded-lg text-center">
-              <p className="text-xs text-muted-foreground mb-2">광고</p>
-              <div className="h-20 flex items-center justify-center bg-background/50 rounded">
-                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
-              </div>
-            </div>
+            <AdSenseBanner 
+              adSlot="1234567890"
+              className="max-w-md mx-auto"
+            />
 
             <div className="text-6xl mb-4">😢</div>
             <h2 className="text-3xl font-bold text-foreground">
@@ -286,12 +285,10 @@ const MemoryGame = () => {
         ) : (
           <div className="text-center space-y-6">
             {/* Google AdSense 배너 */}
-            <div className="w-full max-w-md mx-auto bg-secondary/30 p-4 rounded-lg text-center">
-              <p className="text-xs text-muted-foreground mb-2">광고</p>
-              <div className="h-20 flex items-center justify-center bg-background/50 rounded">
-                <p className="text-xs text-muted-foreground">AdSense 배너 영역</p>
-              </div>
-            </div>
+            <AdSenseBanner 
+              adSlot="1234567890"
+              className="max-w-md mx-auto"
+            />
 
             <div className="text-6xl mb-4">🎉</div>
             <h2 className="text-3xl font-bold text-foreground">
@@ -315,6 +312,13 @@ const MemoryGame = () => {
             </div>
           </div>
         )}
+
+        {/* 보상형 비디오 광고 모달 */}
+        <RewardedVideoAd 
+          isOpen={showRewardedAd}
+          onClose={() => setShowRewardedAd(false)}
+          onRewardEarned={handleAdRewardEarned}
+        />
       </div>
     </div>
   );
