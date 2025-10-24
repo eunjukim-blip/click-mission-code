@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { RewardedVideoAd } from "@/components/ads/RewardedVideoAd";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Gift } from "lucide-react";
+import confetti from "canvas-confetti";
 
 interface LadderOption {
   id: number;
@@ -163,6 +164,11 @@ export default function LadderGame() {
         setGameResult({ reward, finalPosition });
         setShowResult(true);
         
+        // 최고 당첨금(300P)일 때 폭죽 효과
+        if (reward === 300) {
+          triggerConfetti();
+        }
+        
         toast({
           title: "축하합니다! 🎉",
           description: `${reward} 포인트를 획득했습니다!`,
@@ -170,6 +176,37 @@ export default function LadderGame() {
       }, 500);
     }
   }, [currentPathIndex, animatingPath, rewards]);
+
+  const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    const randomInRange = (min: number, max: number) => {
+      return Math.random() * (max - min) + min;
+    };
+
+    const interval = window.setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
+  };
 
   const handleReset = () => {
     setSelectedOption(null);

@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft, Check, X } from "lucide-react";
+import confetti from "canvas-confetti";
 
 interface Question {
   question: string;
@@ -97,6 +98,37 @@ const QuizGame = () => {
     }
   };
 
+  const triggerConfetti = () => {
+    const duration = 2000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+    const randomInRange = (min: number, max: number) => {
+      return Math.random() * (max - min) + min;
+    };
+
+    const interval = window.setInterval(() => {
+      const timeLeft = animationEnd - Date.now();
+
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
+
+      const particleCount = 50 * (timeLeft / duration);
+      
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
+  };
+
   const handleAnswer = (answer: boolean) => {
     if (answered) return;
 
@@ -106,6 +138,8 @@ const QuizGame = () => {
     const correct = answer === questions[currentIndex].answer;
     if (correct) {
       setScore(score + 1);
+      // 정답일 때 폭죽 효과
+      setTimeout(() => triggerConfetti(), 300);
     }
   };
 
