@@ -49,6 +49,9 @@ export default function RockPaperScissorsGame() {
   const [computerWins, setComputerWins] = useState(0);
   const [gameResult, setGameResult] = useState<"win" | "lose" | null>(null);
   const [showAdDialog, setShowAdDialog] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
+  const [showingSuspense, setShowingSuspense] = useState(false);
+  const [countdown, setCountdown] = useState<string>("");
 
   const startGame = useCallback(() => {
     setStage("playing");
@@ -61,43 +64,57 @@ export default function RockPaperScissorsGame() {
 
   const makeChoice = useCallback(
     (playerChoice: Choice) => {
+      // 선택 애니메이션 시작
+      setIsShaking(true);
+      setShowingSuspense(true);
+      
+      // 카운트다운 효과
+      setCountdown("가위!");
+      setTimeout(() => setCountdown("바위!"), 600);
+      setTimeout(() => setCountdown("보!"), 1200);
+      
       const computerChoice = CHOICES[Math.floor(Math.random() * CHOICES.length)];
       const result = determineWinner(playerChoice, computerChoice);
 
-      const newRound: Round = { playerChoice, computerChoice, result };
-      const newRounds = [...rounds, newRound];
-      setRounds(newRounds);
+      // 1.8초 후에 결과 공개
+      setTimeout(() => {
+        setIsShaking(false);
+        setCountdown("");
+        
+        const newRound: Round = { playerChoice, computerChoice, result };
+        const newRounds = [...rounds, newRound];
+        setRounds(newRounds);
 
-      let newPlayerWins = playerWins;
-      let newComputerWins = computerWins;
+        let newPlayerWins = playerWins;
+        let newComputerWins = computerWins;
 
-      if (result === "win") {
-        newPlayerWins++;
-        setPlayerWins(newPlayerWins);
-      } else if (result === "lose") {
-        newComputerWins++;
-        setComputerWins(newComputerWins);
-      }
+        if (result === "win") {
+          newPlayerWins++;
+          setPlayerWins(newPlayerWins);
+        } else if (result === "lose") {
+          newComputerWins++;
+          setComputerWins(newComputerWins);
+        }
 
-      // 3판 진행 후 또는 2승 먼저 달성 시 게임 종료
-      const nextRound = currentRound + 1;
-      setCurrentRound(nextRound);
+        const nextRound = currentRound + 1;
+        setCurrentRound(nextRound);
+        
+        setShowingSuspense(false);
 
-      if (newPlayerWins === 2) {
-        // 플레이어 승리
-        setGameResult("win");
-        setTimeout(() => {
-          setStage("result");
-          saveResult(newRounds.length, newPlayerWins, newComputerWins, "win");
-        }, 1500);
-      } else if (newComputerWins === 2) {
-        // 컴퓨터 승리
-        setGameResult("lose");
-        setTimeout(() => {
-          setStage("result");
-          saveResult(newRounds.length, newPlayerWins, newComputerWins, "lose");
-        }, 1500);
-      }
+        if (newPlayerWins === 2) {
+          setGameResult("win");
+          setTimeout(() => {
+            setStage("result");
+            saveResult(newRounds.length, newPlayerWins, newComputerWins, "win");
+          }, 1500);
+        } else if (newComputerWins === 2) {
+          setGameResult("lose");
+          setTimeout(() => {
+            setStage("result");
+            saveResult(newRounds.length, newPlayerWins, newComputerWins, "lose");
+          }, 1500);
+        }
+      }, 1800);
     },
     [rounds, currentRound, playerWins, computerWins]
   );
@@ -191,11 +208,34 @@ export default function RockPaperScissorsGame() {
               </div>
             </Card>
 
-            {rounds.length > 0 && (
+            {isShaking && (
               <Card className="p-6 text-center animate-in fade-in duration-300">
+                <div className="flex justify-around items-center mb-6">
+                  <div className="text-center">
+                    <div className="text-6xl mb-2 animate-[shake_0.5s_ease-in-out_infinite]">
+                      ✊
+                    </div>
+                    <p className="text-sm text-muted-foreground">플레이어</p>
+                  </div>
+                  <div className="text-4xl">VS</div>
+                  <div className="text-center">
+                    <div className="text-6xl mb-2 animate-[shake_0.5s_ease-in-out_infinite]">
+                      ✊
+                    </div>
+                    <p className="text-sm text-muted-foreground">컴퓨터</p>
+                  </div>
+                </div>
+                <div className="text-3xl font-bold animate-pulse text-primary">
+                  {countdown}
+                </div>
+              </Card>
+            )}
+
+            {!isShaking && rounds.length > 0 && (
+              <Card className="p-6 text-center animate-in fade-in zoom-in duration-500">
                 <div className="flex justify-around items-center mb-4">
                   <div className="text-center">
-                    <div className="text-6xl mb-2">
+                    <div className="text-6xl mb-2 animate-in zoom-in duration-300">
                       {CHOICE_EMOJI[rounds[rounds.length - 1].playerChoice]}
                     </div>
                     <p className="text-sm text-muted-foreground">플레이어</p>
@@ -205,7 +245,7 @@ export default function RockPaperScissorsGame() {
                   </div>
                   <div className="text-4xl">VS</div>
                   <div className="text-center">
-                    <div className="text-6xl mb-2">
+                    <div className="text-6xl mb-2 animate-in zoom-in duration-300 delay-100">
                       {CHOICE_EMOJI[rounds[rounds.length - 1].computerChoice]}
                     </div>
                     <p className="text-sm text-muted-foreground">컴퓨터</p>
@@ -214,7 +254,7 @@ export default function RockPaperScissorsGame() {
                     </p>
                   </div>
                 </div>
-                <div className="text-xl font-bold">
+                <div className="text-xl font-bold animate-in zoom-in duration-300 delay-200">
                   {rounds[rounds.length - 1].result === "win" && "🎉 승리!"}
                   {rounds[rounds.length - 1].result === "lose" && "😢 패배"}
                   {rounds[rounds.length - 1].result === "draw" && "🤝 무승부"}
@@ -222,7 +262,7 @@ export default function RockPaperScissorsGame() {
               </Card>
             )}
 
-            {gameResult === null && (
+            {gameResult === null && !showingSuspense && (
               <Card className="p-6">
                 <p className="text-center mb-4 font-medium">선택하세요!</p>
                 <div className="flex justify-center gap-4">
@@ -231,7 +271,8 @@ export default function RockPaperScissorsGame() {
                       key={choice}
                       onClick={() => makeChoice(choice)}
                       size="lg"
-                      className="flex flex-col h-auto py-6 px-8"
+                      className="flex flex-col h-auto py-6 px-8 hover:scale-110 transition-transform duration-200"
+                      disabled={isShaking}
                     >
                       <span className="text-4xl mb-2">{CHOICE_EMOJI[choice]}</span>
                       <span>{CHOICE_NAME[choice]}</span>

@@ -99,6 +99,11 @@ export default {
           "0%, 100%": { transform: "scale(1)" },
           "50%": { transform: "scale(1.05)" },
         },
+        shake: {
+          "0%, 100%": { transform: "translateX(0) rotate(0deg)" },
+          "10%, 30%, 50%, 70%, 90%": { transform: "translateX(-5px) rotate(-5deg)" },
+          "20%, 40%, 60%, 80%": { transform: "translateX(5px) rotate(5deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -106,6 +111,7 @@ export default {
         bounce: "bounce 1s infinite",
         wiggle: "wiggle 0.5s ease-in-out",
         pulse: "pulse 2s ease-in-out infinite",
+        shake: "shake 0.5s ease-in-out infinite",
       },
     },
   },
