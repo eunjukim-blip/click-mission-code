@@ -215,7 +215,7 @@ export default function RockPaperScissorsGame() {
                     <div className="text-6xl mb-2 animate-[shake_0.5s_ease-in-out_infinite]">
                       ✊
                     </div>
-                    <p className="text-sm text-muted-foreground">플레이어</p>
+                    <p className="text-sm text-muted-foreground">나</p>
                   </div>
                   <div className="text-4xl">VS</div>
                   <div className="text-center">
@@ -238,7 +238,7 @@ export default function RockPaperScissorsGame() {
                     <div className="text-6xl mb-2 animate-in zoom-in duration-300">
                       {CHOICE_EMOJI[rounds[rounds.length - 1].playerChoice]}
                     </div>
-                    <p className="text-sm text-muted-foreground">플레이어</p>
+                    <p className="text-sm text-muted-foreground">나</p>
                     <p className="font-medium">
                       {CHOICE_NAME[rounds[rounds.length - 1].playerChoice]}
                     </p>
