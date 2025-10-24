@@ -21,7 +21,8 @@ export type Database = {
           created_at: string
           id: string
           reward_points: number
-          user_id: string
+          user_id: string | null
+          user_identifier: string | null
         }
         Insert: {
           attendance_date?: string
@@ -29,7 +30,8 @@ export type Database = {
           created_at?: string
           id?: string
           reward_points?: number
-          user_id: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Update: {
           attendance_date?: string
@@ -37,7 +39,8 @@ export type Database = {
           created_at?: string
           id?: string
           reward_points?: number
-          user_id?: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Relationships: []
       }
@@ -121,7 +124,8 @@ export type Database = {
           id: string
           points_earned: number
           result: Json | null
-          user_id: string
+          user_id: string | null
+          user_identifier: string | null
         }
         Insert: {
           created_at?: string
@@ -130,7 +134,8 @@ export type Database = {
           id?: string
           points_earned?: number
           result?: Json | null
-          user_id: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Update: {
           created_at?: string
@@ -139,7 +144,8 @@ export type Database = {
           id?: string
           points_earned?: number
           result?: Json | null
-          user_id?: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Relationships: []
       }
@@ -309,6 +315,7 @@ export type Database = {
           id: string
           total_points: number
           updated_at: string
+          user_identifier: string | null
         }
         Insert: {
           created_at?: string
@@ -317,6 +324,7 @@ export type Database = {
           id: string
           total_points?: number
           updated_at?: string
+          user_identifier?: string | null
         }
         Update: {
           created_at?: string
@@ -325,6 +333,7 @@ export type Database = {
           id?: string
           total_points?: number
           updated_at?: string
+          user_identifier?: string | null
         }
         Relationships: []
       }
@@ -381,7 +390,8 @@ export type Database = {
           rounds_lost: number
           rounds_played: number
           rounds_won: number
-          user_id: string
+          user_id: string | null
+          user_identifier: string | null
         }
         Insert: {
           created_at?: string
@@ -390,7 +400,8 @@ export type Database = {
           rounds_lost: number
           rounds_played: number
           rounds_won: number
-          user_id: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Update: {
           created_at?: string
@@ -399,7 +410,8 @@ export type Database = {
           rounds_lost?: number
           rounds_played?: number
           rounds_won?: number
-          user_id?: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Relationships: []
       }
@@ -413,7 +425,8 @@ export type Database = {
           mission_date: string
           mission_id: string
           updated_at: string
-          user_id: string
+          user_id: string | null
+          user_identifier: string | null
         }
         Insert: {
           completed?: boolean
@@ -424,7 +437,8 @@ export type Database = {
           mission_date?: string
           mission_id: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Update: {
           completed?: boolean
@@ -435,7 +449,8 @@ export type Database = {
           mission_date?: string
           mission_id?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Relationships: [
           {
@@ -513,7 +528,8 @@ export type Database = {
           login_streak: number
           total_games_played: number
           updated_at: string
-          user_id: string
+          user_id: string | null
+          user_identifier: string | null
         }
         Insert: {
           created_at?: string
@@ -524,7 +540,8 @@ export type Database = {
           login_streak?: number
           total_games_played?: number
           updated_at?: string
-          user_id: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Update: {
           created_at?: string
@@ -535,7 +552,8 @@ export type Database = {
           login_streak?: number
           total_games_played?: number
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
+          user_identifier?: string | null
         }
         Relationships: []
       }
@@ -548,7 +566,8 @@ export type Database = {
           total_games: number
           total_points: number
           updated_at: string
-          user_id: string
+          user_id: string | null
+          user_identifier: string | null
           week_start_date: string
         }
         Insert: {
@@ -559,7 +578,8 @@ export type Database = {
           total_games?: number
           total_points?: number
           updated_at?: string
-          user_id: string
+          user_id?: string | null
+          user_identifier?: string | null
           week_start_date: string
         }
         Update: {
@@ -570,7 +590,8 @@ export type Database = {
           total_games?: number
           total_points?: number
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
+          user_identifier?: string | null
           week_start_date?: string
         }
         Relationships: []

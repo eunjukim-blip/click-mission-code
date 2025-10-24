@@ -10,6 +10,7 @@ interface GameRewardRequest {
   gameType: string;
   result: any;
   pointsEarned: number;
+  userIdentifier: string;
 }
 
 serve(async (req) => {
@@ -22,28 +23,19 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 인증 확인
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      throw new Error("No authorization header");
+    const { gameType, result, pointsEarned, userIdentifier }: GameRewardRequest = await req.json();
+
+    if (!userIdentifier || !/^[A-Z0-9]{24}$/.test(userIdentifier)) {
+      throw new Error("Invalid user identifier");
     }
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
-    if (userError || !user) {
-      throw new Error("Unauthorized");
-    }
-
-    const { gameType, result, pointsEarned }: GameRewardRequest = await req.json();
-
-    console.log(`Processing reward for user ${user.id}, game: ${gameType}, points: ${pointsEarned}`);
+    console.log(`Processing reward for user ${userIdentifier}, game: ${gameType}, points: ${pointsEarned}`);
 
     // 1. user_stats 가져오기 또는 생성
     let { data: userStats, error: statsError } = await supabase
       .from("user_stats")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_identifier", userIdentifier)
       .single();
 
     if (statsError && statsError.code === "PGRST116") {
@@ -51,7 +43,7 @@ serve(async (req) => {
       const { data: newStats, error: createError } = await supabase
         .from("user_stats")
         .insert({
-          user_id: user.id,
+          user_identifier: userIdentifier,
           level: 1,
           experience: 0,
           total_games_played: 0,
@@ -84,27 +76,37 @@ serve(async (req) => {
         level: newLevel,
         total_games_played: (userStats?.total_games_played || 0) + 1,
       })
-      .eq("user_id", user.id);
+      .eq("user_identifier", userIdentifier);
 
     // 4. 포인트 적립 (profiles 테이블)
     const { data: profile } = await supabase
       .from("profiles")
       .select("total_points")
-      .eq("id", user.id)
+      .eq("user_identifier", userIdentifier)
       .single();
 
-    const newPoints = (profile?.total_points || 0) + pointsEarned;
-
-    await supabase
-      .from("profiles")
-      .update({ total_points: newPoints })
-      .eq("id", user.id);
+    if (profile) {
+      const newPoints = (profile?.total_points || 0) + pointsEarned;
+      await supabase
+        .from("profiles")
+        .update({ total_points: newPoints })
+        .eq("user_identifier", userIdentifier);
+    } else {
+      // 프로필이 없으면 생성
+      await supabase
+        .from("profiles")
+        .insert({
+          user_identifier: userIdentifier,
+          total_points: pointsEarned,
+          display_name: `User ${userIdentifier.slice(0, 6)}`,
+        });
+    }
 
     // 5. 게임 활동 로그 기록
     await supabase
       .from("game_activity_log")
       .insert({
-        user_id: user.id,
+        user_identifier: userIdentifier,
         game_type: gameType,
         points_earned: pointsEarned,
         exp_earned: expEarned,
@@ -120,7 +122,7 @@ serve(async (req) => {
     const { data: ranking } = await supabase
       .from("weekly_rankings")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_identifier", userIdentifier)
       .eq("week_start_date", weekStartStr)
       .single();
 
@@ -136,7 +138,7 @@ serve(async (req) => {
       await supabase
         .from("weekly_rankings")
         .insert({
-          user_id: user.id,
+          user_identifier: userIdentifier,
           week_start_date: weekStartStr,
           total_points: pointsEarned,
           total_games: 1,
@@ -144,7 +146,7 @@ serve(async (req) => {
     }
 
     // 7. 미션 진행도 업데이트
-    await updateMissionProgress(supabase, user.id, gameType);
+    await updateMissionProgress(supabase, userIdentifier, gameType);
 
     console.log(`Reward processed: ${pointsEarned}P, ${expEarned} EXP (Lv${currentLevel} bonus), Level: ${newLevel}`);
 
@@ -155,7 +157,6 @@ serve(async (req) => {
         expEarned,
         newLevel,
         leveledUp,
-        totalPoints: newPoints,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
@@ -168,7 +169,7 @@ serve(async (req) => {
   }
 });
 
-async function updateMissionProgress(supabase: any, userId: string, gameType: string) {
+async function updateMissionProgress(supabase: any, userIdentifier: string, gameType: string) {
   const today = new Date().toISOString().split("T")[0];
 
   // 해당 게임 타입 미션 찾기
@@ -196,7 +197,7 @@ async function updateMissionProgress(supabase: any, userId: string, gameType: st
       const { data: progress } = await supabase
         .from("user_mission_progress")
         .select("*")
-        .eq("user_id", userId)
+        .eq("user_identifier", userIdentifier)
         .eq("mission_id", mission.id)
         .eq("mission_date", today)
         .single();
@@ -217,26 +218,42 @@ async function updateMissionProgress(supabase: any, userId: string, gameType: st
 
         // 완료 시 보상 지급
         if (completed && !progress.completed) {
-          await supabase
+          const { data: profile } = await supabase
             .from("profiles")
-            .update({
-              total_points: supabase.rpc("increment", { x: mission.reward_points }),
-            })
-            .eq("id", userId);
+            .select("total_points")
+            .eq("user_identifier", userIdentifier)
+            .single();
 
-          await supabase
+          if (profile) {
+            await supabase
+              .from("profiles")
+              .update({
+                total_points: (profile.total_points || 0) + mission.reward_points,
+              })
+              .eq("user_identifier", userIdentifier);
+          }
+
+          const { data: stats } = await supabase
             .from("user_stats")
-            .update({
-              experience: supabase.rpc("increment", { x: mission.reward_exp }),
-            })
-            .eq("user_id", userId);
+            .select("experience")
+            .eq("user_identifier", userIdentifier)
+            .single();
+
+          if (stats) {
+            await supabase
+              .from("user_stats")
+              .update({
+                experience: (stats.experience || 0) + mission.reward_exp,
+              })
+              .eq("user_identifier", userIdentifier);
+          }
         }
       } else {
         // 새로운 진행도 생성
         await supabase
           .from("user_mission_progress")
           .insert({
-            user_id: userId,
+            user_identifier: userIdentifier,
             mission_id: mission.id,
             current_count: 1,
             completed: 1 >= mission.target_count,

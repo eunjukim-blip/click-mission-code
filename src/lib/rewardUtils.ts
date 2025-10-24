@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { getUserIdentifier } from "./userIdentifier";
 
 export const processGameReward = async (
   gameType: string,
@@ -11,22 +12,20 @@ export const processGameReward = async (
   newLevel?: number;
 }> => {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
-      console.log("No session, skipping reward");
+    const userIdentifier = getUserIdentifier();
+    if (!userIdentifier) {
+      console.log("No user identifier, skipping reward");
       return { success: false };
     }
 
     const { data, error } = await supabase.functions.invoke(
       "process-game-reward",
       {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
         body: {
           gameType,
           result,
           pointsEarned,
+          userIdentifier,
         },
       }
     );

@@ -1,27 +1,23 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Trophy, Medal, Award } from "lucide-react";
-import { toast } from "sonner";
+import { Trophy, Medal, ArrowLeft } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { formatUserIdentifier } from "@/lib/userIdentifier";
 
-interface RankingEntry {
-  user_id: string;
+interface RankingData {
+  user_identifier: string;
   total_points: number;
   total_games: number;
-  profiles?: {
-    display_name: string;
-    email: string;
-  };
+  rank: number;
 }
 
 const Leaderboard = () => {
   const navigate = useNavigate();
-  const [rankings, setRankings] = useState<RankingEntry[]>([]);
+  const [rankings, setRankings] = useState<RankingData[]>([]);
   const [loading, setLoading] = useState(true);
-  const [myRank, setMyRank] = useState<number | null>(null);
 
   useEffect(() => {
     loadRankings();
@@ -29,8 +25,6 @@ const Leaderboard = () => {
 
   const loadRankings = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
       const today = new Date();
       const weekStart = new Date(today);
       weekStart.setDate(today.getDate() - today.getDay());
@@ -38,159 +32,132 @@ const Leaderboard = () => {
 
       const { data, error } = await supabase
         .from("weekly_rankings")
-        .select("user_id, total_points, total_games")
+        .select("*")
         .eq("week_start_date", weekStartStr)
         .order("total_points", { ascending: false })
         .limit(50);
 
       if (error) throw error;
 
-      // profiles 정보 추가로 가져오기
-      const rankingsWithProfiles = await Promise.all(
-        (data || []).map(async (ranking) => {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("display_name, email")
-            .eq("id", ranking.user_id)
-            .single();
+      // 순위 부여
+      const rankedData = data?.map((item, index) => ({
+        ...item,
+        rank: index + 1,
+      })) || [];
 
-          return {
-            ...ranking,
-            profiles: profile,
-          };
-        })
-      );
-
-      setRankings(rankingsWithProfiles);
-
-      // 내 순위 찾기
-      if (user) {
-        const myIndex = rankingsWithProfiles?.findIndex((r) => r.user_id === user.id);
-        if (myIndex !== undefined && myIndex !== -1) {
-          setMyRank(myIndex + 1);
-        }
-      }
-
+      setRankings(rankedData);
     } catch (error) {
       console.error("Error loading rankings:", error);
-      toast.error("랭킹을 불러오는데 실패했습니다");
     } finally {
       setLoading(false);
     }
   };
 
-  const getRankIcon = (rank: number) => {
-    if (rank === 1)
-      return <Trophy className="w-6 h-6 text-yellow-500" />;
-    if (rank === 2)
-      return <Medal className="w-6 h-6 text-gray-400" />;
-    if (rank === 3)
-      return <Award className="w-6 h-6 text-orange-600" />;
-    return null;
-  };
-
   const getRankBadge = (rank: number) => {
-    if (rank <= 3) return "default";
-    if (rank <= 10) return "secondary";
-    return "outline";
+    if (rank === 1) {
+      return (
+        <div className="p-2 rounded-full bg-yellow-500/20">
+          <Trophy className="w-6 h-6 text-yellow-500" />
+        </div>
+      );
+    } else if (rank === 2) {
+      return (
+        <div className="p-2 rounded-full bg-gray-400/20">
+          <Medal className="w-6 h-6 text-gray-400" />
+        </div>
+      );
+    } else if (rank === 3) {
+      return (
+        <div className="p-2 rounded-full bg-orange-500/20">
+          <Medal className="w-6 h-6 text-orange-500" />
+        </div>
+      );
+    }
+    return (
+      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+        <span className="font-bold text-sm">{rank}</span>
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen bg-background p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-background to-secondary/20 p-6">
       <div className="max-w-4xl mx-auto space-y-6">
+        {/* 헤더 */}
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/")}
-          >
+          <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold">주간 랭킹</h1>
-            <p className="text-muted-foreground">이번 주 최고의 플레이어</p>
+            <h1 className="text-3xl font-bold flex items-center gap-2">
+              <Trophy className="w-8 h-8 text-yellow-500" />
+              주간 리더보드
+            </h1>
+            <p className="text-muted-foreground">
+              이번 주 최고 성적을 거둔 플레이어들
+            </p>
           </div>
         </div>
 
-        {myRank && (
-          <Card className="bg-gradient-to-r from-primary/20 to-primary/10 border-primary/30">
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {getRankIcon(myRank)}
-                  <div>
-                    <p className="text-sm text-muted-foreground">내 순위</p>
-                    <p className="text-2xl font-bold">#{myRank}</p>
-                  </div>
-                </div>
-                <Badge variant="default">
-                  {rankings[myRank - 1]?.total_points.toLocaleString()}P
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
+        {/* 랭킹 리스트 */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-primary" />
-              TOP 50 랭킹
-            </CardTitle>
+            <CardTitle>TOP 50</CardTitle>
           </CardHeader>
           <CardContent>
             {loading ? (
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-muted-foreground text-center py-8">
                 로딩 중...
               </p>
             ) : rankings.length === 0 ? (
-              <p className="text-center text-muted-foreground py-8">
+              <p className="text-muted-foreground text-center py-8">
                 아직 랭킹 데이터가 없습니다
               </p>
             ) : (
               <div className="space-y-2">
-                {rankings.map((entry, index) => {
-                  const rank = index + 1;
-                  const profile = entry.profiles as any;
-
-                  return (
-                    <div
-                      key={entry.user_id}
-                      className={`flex items-center justify-between p-4 rounded-lg transition-all ${
-                        rank <= 3
-                          ? "bg-primary/10 border-2 border-primary/30"
-                          : "bg-card hover:bg-accent"
-                      }`}
-                    >
-                      <div className="flex items-center gap-4 flex-1">
-                        <Badge variant={getRankBadge(rank)} className="w-12 justify-center">
-                          #{rank}
-                        </Badge>
-                        {getRankIcon(rank)}
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold truncate">
-                            {profile?.display_name || "익명"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            {entry.total_games}회 플레이
-                          </p>
-                        </div>
+                {rankings.map((ranking) => (
+                  <div
+                    key={ranking.user_identifier}
+                    className="flex items-center justify-between p-4 rounded-lg border bg-card hover:bg-accent/50 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      {getRankBadge(ranking.rank)}
+                      <div>
+                        <p className="font-semibold">
+                          User {formatUserIdentifier(ranking.user_identifier).slice(0, 11)}...
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {ranking.total_games} 게임 플레이
+                        </p>
                       </div>
-                      <Badge variant="secondary" className="ml-2">
-                        {entry.total_points.toLocaleString()}P
-                      </Badge>
                     </div>
-                  );
-                })}
+                    <Badge variant="secondary" className="text-lg px-4 py-1">
+                      {ranking.total_points}P
+                    </Badge>
+                  </div>
+                ))}
               </div>
             )}
           </CardContent>
         </Card>
 
-        <div className="text-center text-sm text-muted-foreground space-y-1">
-          <p>💡 매주 일요일에 순위가 초기화됩니다</p>
-          <p>🏆 상위 랭커에게는 특별 보상이 지급됩니다</p>
-        </div>
+        {/* 보상 안내 */}
+        <Card className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
+          <CardContent className="p-6">
+            <div className="flex items-start gap-3">
+              <Trophy className="w-6 h-6 text-yellow-500 mt-1" />
+              <div>
+                <h3 className="font-semibold mb-2">주간 보상</h3>
+                <div className="space-y-1 text-sm text-muted-foreground">
+                  <p>🥇 1위: 1000P</p>
+                  <p>🥈 2위: 500P</p>
+                  <p>🥉 3위: 300P</p>
+                  <p>📍 4-10위: 100P</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

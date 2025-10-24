@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Gift, Flame } from "lucide-react";
 import { toast } from "sonner";
 import confetti from "canvas-confetti";
+import { getUserIdentifier } from "@/lib/userIdentifier";
 
 export const AttendanceCheck = () => {
   const [alreadyChecked, setAlreadyChecked] = useState(false);
@@ -19,15 +20,15 @@ export const AttendanceCheck = () => {
 
   const checkAttendanceStatus = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      const userIdentifier = getUserIdentifier();
+      if (!userIdentifier) return;
 
       const today = new Date().toISOString().split("T")[0];
 
       const { data } = await supabase
         .from("daily_attendance")
         .select("*")
-        .eq("user_id", user.id)
+        .eq("user_identifier", userIdentifier)
         .eq("attendance_date", today)
         .single();
 
@@ -44,29 +45,29 @@ export const AttendanceCheck = () => {
   const handleCheckAttendance = async () => {
     setLoading(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("로그인이 필요합니다");
+      const userIdentifier = getUserIdentifier();
+      if (!userIdentifier) {
+        toast.error("시리얼 넘버가 필요합니다");
         return;
       }
 
       const { data, error } = await supabase.functions.invoke(
         "check-daily-attendance",
         {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
+          body: {
+            userIdentifier,
           },
         }
       );
 
       if (error) throw error;
 
-      if (data.alreadyChecked) {
+      if (!data.success) {
         toast.info("오늘은 이미 출석 체크를 완료했습니다");
       } else {
         setAlreadyChecked(true);
         setConsecutiveDays(data.consecutiveDays);
-        setRewardPoints(data.rewardPoints);
+        setRewardPoints(data.reward);
 
         // 폭죽 효과
         confetti({
@@ -76,91 +77,79 @@ export const AttendanceCheck = () => {
         });
 
         toast.success(
-          `출석 체크 완료! 🎉\n${data.consecutiveDays}일 연속 출석\n${data.rewardPoints}P 획득!`,
+          `출석 체크 완료! 🎉\n${data.consecutiveDays}일 연속 출석\n${data.reward}P 획득!`,
           { duration: 5000 }
         );
       }
     } catch (error) {
       console.error("Error checking attendance:", error);
-      toast.error("출석 체크에 실패했습니다");
+      toast.error("출석 체크 중 오류가 발생했습니다");
     } finally {
       setLoading(false);
     }
   };
 
-  const getRewardForDay = (day: number) => {
-    if (day >= 7) return 50;
-    if (day >= 5) return 35;
-    if (day >= 3) return 25;
-    if (day >= 2) return 15;
-    return 10;
-  };
-
   return (
-    <Card className="animate-fade-in">
+    <Card className="bg-gradient-to-br from-orange-500/20 via-orange-500/10 to-background animate-fade-in">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Calendar className="w-5 h-5 text-primary" />
+          <Calendar className="w-5 h-5" />
           출석 체크
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20">
-          <div className="flex items-center gap-3">
-            <Flame className="w-8 h-8 text-orange-500" />
-            <div>
-              <p className="text-sm text-muted-foreground">연속 출석</p>
-              <p className="text-2xl font-bold">{consecutiveDays}일</p>
-            </div>
-          </div>
-          {alreadyChecked && (
-            <Badge variant="default" className="gap-1">
-              <Gift className="w-3 h-3" />
-              +{rewardPoints}P
-            </Badge>
-          )}
-        </div>
-
-        {!alreadyChecked ? (
-          <Button
-            onClick={handleCheckAttendance}
-            disabled={loading}
-            className="w-full"
-            size="lg"
-          >
-            {loading ? "처리 중..." : "오늘의 출석 체크하기"}
-          </Button>
-        ) : (
-          <div className="text-center p-4 rounded-lg bg-muted">
-            <p className="text-sm text-muted-foreground">
-              ✅ 오늘 출석 체크를 완료했습니다!
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              내일 다시 방문해주세요
-            </p>
-          </div>
-        )}
-
-        <div className="space-y-2">
-          <p className="text-sm font-semibold">연속 출석 보상</p>
-          <div className="grid grid-cols-7 gap-2">
-            {[1, 2, 3, 4, 5, 6, 7].map((day) => (
-              <div
-                key={day}
-                className={`text-center p-2 rounded border ${
-                  consecutiveDays >= day
-                    ? "bg-primary/10 border-primary"
-                    : "bg-card border-border"
-                }`}
-              >
-                <p className="text-xs font-semibold">{day}일</p>
-                <p className="text-xs text-muted-foreground">
-                  {getRewardForDay(day)}P
-                </p>
+        {alreadyChecked ? (
+          <>
+            <div className="flex items-center justify-center p-6 bg-primary/10 rounded-lg">
+              <div className="text-center space-y-2">
+                <Gift className="w-12 h-12 mx-auto text-primary animate-bounce" />
+                <p className="text-lg font-semibold">출석 완료!</p>
+                <Badge variant="secondary" className="text-lg px-3 py-1">
+                  +{rewardPoints}P
+                </Badge>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-orange-500/10 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-orange-500" />
+                <span className="font-medium">연속 출석</span>
+              </div>
+              <Badge variant="outline" className="text-lg">
+                {consecutiveDays}일
+              </Badge>
+            </div>
+
+            <p className="text-sm text-muted-foreground text-center">
+              내일 다시 출석하면 보너스 포인트를 받을 수 있어요!
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="text-center p-6 space-y-2">
+              <Calendar className="w-12 h-12 mx-auto text-primary" />
+              <p className="text-lg font-semibold">오늘의 출석체크</p>
+              <p className="text-sm text-muted-foreground">
+                매일 출석하고 보상을 받으세요!
+              </p>
+            </div>
+
+            <Button
+              onClick={handleCheckAttendance}
+              disabled={loading}
+              size="lg"
+              className="w-full"
+            >
+              <Gift className="w-4 h-4 mr-2" />
+              {loading ? "처리 중..." : "출석 체크하기"}
+            </Button>
+
+            <div className="text-xs text-muted-foreground text-center">
+              <p>기본 보상: 10P</p>
+              <p>연속 출석 3일마다 +10P 보너스!</p>
+            </div>
+          </>
+        )}
       </CardContent>
     </Card>
   );

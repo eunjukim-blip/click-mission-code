@@ -2,27 +2,38 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Card, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Gamepad2, Trophy, LogIn, Award } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { Gamepad2, Trophy, Award, Key, Copy } from "lucide-react";
 import { UserLevelCard } from "@/components/rewards/UserLevelCard";
 import { AttendanceCheck } from "@/components/rewards/AttendanceCheck";
 import { DailyMissions } from "@/components/rewards/DailyMissions";
+import { SerialNumberInput } from "@/components/SerialNumberInput";
+import { getUserIdentifier, formatUserIdentifier } from "@/lib/userIdentifier";
+import { toast } from "sonner";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const [userIdentifier, setUserIdentifier] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
+    const identifier = getUserIdentifier();
+    setUserIdentifier(identifier);
   }, []);
+
+  const handleSerialNumberSuccess = () => {
+    const identifier = getUserIdentifier();
+    setUserIdentifier(identifier);
+  };
+
+  const copySerialNumber = () => {
+    if (userIdentifier) {
+      navigator.clipboard.writeText(userIdentifier);
+      toast.success("시리얼 넘버가 클립보드에 복사되었습니다!");
+    }
+  };
+
+  if (!userIdentifier) {
+    return <SerialNumberInput onSuccess={handleSerialNumberSuccess} />;
+  }
 
   return (
     <div className="min-h-screen bg-background p-6">
@@ -42,33 +53,34 @@ const Index = () => {
               <Award className="w-4 h-4" />
               랭킹
             </Button>
-            {user ? (
-              <Button
-                variant="outline"
-                onClick={() => supabase.auth.signOut()}
-              >
-                로그아웃
-              </Button>
-            ) : (
-              <Button
-                variant="outline"
-                onClick={() => navigate("/auth")}
-                className="gap-2"
-              >
-                <LogIn className="w-4 h-4" />
-                로그인
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              onClick={copySerialNumber}
+              className="gap-2"
+            >
+              <Copy className="w-4 h-4" />
+              시리얼 복사
+            </Button>
           </div>
         </div>
 
-        {user && (
-          <div className="grid md:grid-cols-3 gap-6">
+        <div className="bg-card/50 backdrop-blur-sm p-3 rounded-lg border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Key className="w-4 h-4 text-primary" />
+              <span className="text-sm font-medium">시리얼 넘버</span>
+            </div>
+            <code className="text-xs bg-muted px-2 py-1 rounded">
+              {formatUserIdentifier(userIdentifier)}
+            </code>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
             <UserLevelCard />
             <AttendanceCheck />
-            <DailyMissions />
-          </div>
-        )}
+          <DailyMissions />
+        </div>
 
         {/* 게임 카드 */}
         <div>

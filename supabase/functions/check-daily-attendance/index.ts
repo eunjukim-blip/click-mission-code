@@ -16,113 +16,119 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 인증 확인
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      throw new Error("No authorization header");
-    }
+    const { userIdentifier } = await req.json();
 
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
-    
-    if (userError || !user) {
-      throw new Error("Unauthorized");
+    if (!userIdentifier || !/^[A-Z0-9]{24}$/.test(userIdentifier)) {
+      throw new Error("Invalid user identifier");
     }
 
     const today = new Date().toISOString().split("T")[0];
 
     // 오늘 출석 체크 여부 확인
-    const { data: todayAttendance } = await supabase
+    const { data: existingAttendance } = await supabase
       .from("daily_attendance")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_identifier", userIdentifier)
       .eq("attendance_date", today)
       .single();
 
-    if (todayAttendance) {
+    if (existingAttendance) {
       return new Response(
         JSON.stringify({
-          alreadyChecked: true,
-          consecutiveDays: todayAttendance.consecutive_days,
-          rewardPoints: todayAttendance.reward_points,
+          success: false,
+          message: "Already checked in today",
+          attendance: existingAttendance,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    // 어제 출석 확인
+    // 어제 날짜
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayStr = yesterday.toISOString().split("T")[0];
 
+    // 어제 출석 확인
     const { data: yesterdayAttendance } = await supabase
       .from("daily_attendance")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_identifier", userIdentifier)
       .eq("attendance_date", yesterdayStr)
       .single();
 
-    // 연속 일수 계산
-    const consecutiveDays = yesterdayAttendance 
-      ? yesterdayAttendance.consecutive_days + 1 
-      : 1;
-
-    // 보상 포인트 계산 (연속 일수에 따라 증가)
-    // 1일: 10P, 2일: 15P, 3일: 20P, ..., 7일 이상: 50P
-    let rewardPoints = 10;
-    if (consecutiveDays >= 7) {
-      rewardPoints = 50;
-    } else if (consecutiveDays >= 5) {
-      rewardPoints = 35;
-    } else if (consecutiveDays >= 3) {
-      rewardPoints = 25;
-    } else if (consecutiveDays >= 2) {
-      rewardPoints = 15;
+    // 연속 출석일 계산
+    let consecutiveDays = 1;
+    if (yesterdayAttendance) {
+      consecutiveDays = (yesterdayAttendance.consecutive_days || 0) + 1;
     }
 
+    // 연속 출석 보너스 계산 (3일마다 보너스 +10P)
+    const baseReward = 10;
+    const bonusReward = Math.floor(consecutiveDays / 3) * 10;
+    const totalReward = baseReward + bonusReward;
+
     // 출석 체크 기록
-    await supabase
+    const { data: newAttendance, error: attendanceError } = await supabase
       .from("daily_attendance")
       .insert({
-        user_id: user.id,
+        user_identifier: userIdentifier,
         attendance_date: today,
-        reward_points: rewardPoints,
         consecutive_days: consecutiveDays,
-      });
+        reward_points: totalReward,
+      })
+      .select()
+      .single();
+
+    if (attendanceError) throw attendanceError;
 
     // 포인트 지급
     const { data: profile } = await supabase
       .from("profiles")
       .select("total_points")
-      .eq("id", user.id)
+      .eq("user_identifier", userIdentifier)
       .single();
 
-    await supabase
-      .from("profiles")
-      .update({
-        total_points: (profile?.total_points || 0) + rewardPoints,
-      })
-      .eq("id", user.id);
+    if (profile) {
+      await supabase
+        .from("profiles")
+        .update({
+          total_points: (profile.total_points || 0) + totalReward,
+        })
+        .eq("user_identifier", userIdentifier);
+    } else {
+      // 프로필이 없으면 생성
+      await supabase
+        .from("profiles")
+        .insert({
+          user_identifier: userIdentifier,
+          total_points: totalReward,
+          display_name: `User ${userIdentifier.slice(0, 6)}`,
+        });
+    }
 
-    // user_stats의 login_streak 업데이트
-    await supabase
+    // 경험치 지급
+    const expReward = totalReward;
+    const { data: stats } = await supabase
       .from("user_stats")
-      .upsert({
-        user_id: user.id,
-        login_streak: consecutiveDays,
-        last_login_date: today,
-      }, {
-        onConflict: "user_id",
-      });
+      .select("experience")
+      .eq("user_identifier", userIdentifier)
+      .single();
 
-    console.log(`Attendance checked for user ${user.id}: ${consecutiveDays} days, ${rewardPoints}P`);
+    if (stats) {
+      await supabase
+        .from("user_stats")
+        .update({
+          experience: (stats.experience || 0) + expReward,
+        })
+        .eq("user_identifier", userIdentifier);
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
+        attendance: newAttendance,
         consecutiveDays,
-        rewardPoints,
-        alreadyChecked: false,
+        reward: totalReward,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
