@@ -20,6 +20,7 @@ const QuizGame = lazy(() => import("./pages/QuizGame"));
 const QuizGameResult = lazy(() => import("./pages/QuizGameResult"));
 const NumberSequenceGame = lazy(() => import("./pages/NumberSequenceGame"));
 const LadderGame = lazy(() => import("./pages/LadderGame"));
+const RockPaperScissorsGame = lazy(() => import("./pages/RockPaperScissorsGame"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ const App = () => (
             <Route path="/quiz/result" element={<QuizGameResult />} />
             <Route path="/number-sequence" element={<NumberSequenceGame />} />
             <Route path="/ladder" element={<LadderGame />} />
+            <Route path="/rock-paper-scissors" element={<RockPaperScissorsGame />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

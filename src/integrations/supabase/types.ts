@@ -280,6 +280,36 @@ export type Database = {
         }
         Relationships: []
       }
+      rock_paper_scissors_games: {
+        Row: {
+          created_at: string
+          id: string
+          result: string
+          rounds_lost: number
+          rounds_played: number
+          rounds_won: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          result: string
+          rounds_lost: number
+          rounds_played: number
+          rounds_won: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          result?: string
+          rounds_lost?: number
+          rounds_played?: number
+          rounds_won?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_rewards: {
         Row: {
           amount: number

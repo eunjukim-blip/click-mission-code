@@ -119,6 +119,16 @@ const Index = () => {
             <CardTitle className="text-xl">사다리게임</CardTitle>
           </CardHeader>
         </Card>
+
+        <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg"
+          onClick={() => navigate("/rock-paper-scissors")}
+        >
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">✊</div>
+            <CardTitle className="text-xl">가위바위보</CardTitle>
+          </CardHeader>
+        </Card>
       </div>
     </div>
   );
