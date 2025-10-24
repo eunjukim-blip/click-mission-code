@@ -14,6 +14,69 @@ export type Database = {
   }
   public: {
     Tables: {
+      daily_attendance: {
+        Row: {
+          attendance_date: string
+          consecutive_days: number
+          created_at: string
+          id: string
+          reward_points: number
+          user_id: string
+        }
+        Insert: {
+          attendance_date?: string
+          consecutive_days?: number
+          created_at?: string
+          id?: string
+          reward_points?: number
+          user_id: string
+        }
+        Update: {
+          attendance_date?: string
+          consecutive_days?: number
+          created_at?: string
+          id?: string
+          reward_points?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      daily_missions: {
+        Row: {
+          created_at: string
+          description: string
+          id: string
+          is_active: boolean
+          mission_type: string
+          reward_exp: number
+          reward_points: number
+          target_count: number
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          id?: string
+          is_active?: boolean
+          mission_type: string
+          reward_exp?: number
+          reward_points: number
+          target_count?: number
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          id?: string
+          is_active?: boolean
+          mission_type?: string
+          reward_exp?: number
+          reward_points?: number
+          target_count?: number
+          title?: string
+        }
+        Relationships: []
+      }
       daily_ranking_rewards: {
         Row: {
           created_at: string | null
@@ -47,6 +110,36 @@ export type Database = {
           rewarded_at?: string | null
           time_taken?: number
           user_identifier?: string
+        }
+        Relationships: []
+      }
+      game_activity_log: {
+        Row: {
+          created_at: string
+          exp_earned: number
+          game_type: string
+          id: string
+          points_earned: number
+          result: Json | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          exp_earned?: number
+          game_type: string
+          id?: string
+          points_earned?: number
+          result?: Json | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          exp_earned?: number
+          game_type?: string
+          id?: string
+          points_earned?: number
+          result?: Json | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -310,6 +403,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_mission_progress: {
+        Row: {
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          current_count: number
+          id: string
+          mission_date: string
+          mission_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_count?: number
+          id?: string
+          mission_date?: string
+          mission_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          current_count?: number
+          id?: string
+          mission_date?: string
+          mission_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_mission_progress_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "daily_missions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_rewards: {
         Row: {
           amount: number
@@ -366,11 +503,88 @@ export type Database = {
         }
         Relationships: []
       }
+      user_stats: {
+        Row: {
+          created_at: string
+          experience: number
+          id: string
+          last_login_date: string | null
+          level: number
+          login_streak: number
+          total_games_played: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          experience?: number
+          id?: string
+          last_login_date?: string | null
+          level?: number
+          login_streak?: number
+          total_games_played?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          experience?: number
+          id?: string
+          last_login_date?: string | null
+          level?: number
+          login_streak?: number
+          total_games_played?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      weekly_rankings: {
+        Row: {
+          created_at: string
+          id: string
+          rank: number | null
+          reward_claimed: boolean
+          total_games: number
+          total_points: number
+          updated_at: string
+          user_id: string
+          week_start_date: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rank?: number | null
+          reward_claimed?: boolean
+          total_games?: number
+          total_points?: number
+          updated_at?: string
+          user_id: string
+          week_start_date: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rank?: number | null
+          reward_claimed?: boolean
+          total_games?: number
+          total_points?: number
+          updated_at?: string
+          user_id?: string
+          week_start_date?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_level_from_exp: { Args: { exp: number }; Returns: number }
+      exp_needed_for_next_level: {
+        Args: { current_level: number }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

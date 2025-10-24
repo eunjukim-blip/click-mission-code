@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import confetti from "canvas-confetti";
+import { processGameReward } from "@/lib/rewardUtils";
 
 const QuizGameResult = () => {
   const navigate = useNavigate();
@@ -32,9 +33,10 @@ const QuizGameResult = () => {
   useEffect(() => {
     checkRetryLimit();
     
-    // 정답일 때 폭죽 효과
+    // 정답일 때 폭죽 효과 및 리워드 처리
     if (isCorrect) {
       setTimeout(() => triggerConfetti(), 500);
+      processGameReward("quiz", { correct: true, question }, 10);
     }
   }, []);
 
