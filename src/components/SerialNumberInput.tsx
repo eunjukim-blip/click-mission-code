@@ -27,10 +27,10 @@ export const SerialNumberInput = ({ onSuccess }: SerialNumberInputProps) => {
   };
 
   const handleSubmit = () => {
-    const cleanedInput = inputValue.replace(/-/g, "").toUpperCase();
+    const cleanedInput = inputValue.trim();
     
     if (!isValidUserIdentifier(cleanedInput)) {
-      toast.error("올바른 형식이 아닙니다. 24자리 영문 대문자와 숫자만 입력 가능합니다.");
+      toast.error("올바른 형식이 아닙니다. 4자리 숫자만 입력 가능합니다.");
       return;
     }
 
@@ -55,14 +55,14 @@ export const SerialNumberInput = ({ onSuccess }: SerialNumberInputProps) => {
           <div className="space-y-2">
             <label className="text-sm font-medium">시리얼 넘버</label>
             <Input
-              placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX"
+              placeholder="0000"
               value={inputValue}
-              onChange={(e) => setInputValue(e.target.value.toUpperCase())}
-              maxLength={29} // 24 + 3 hyphens
-              className="font-mono"
+              onChange={(e) => setInputValue(e.target.value.replace(/\D/g, '').slice(0, 4))}
+              maxLength={4}
+              className="font-mono text-center text-2xl"
             />
             <p className="text-xs text-muted-foreground">
-              24자리 영문 대문자와 숫자 (하이픈 자동 제거)
+              4자리 숫자 (0000-9999)
             </p>
           </div>
 

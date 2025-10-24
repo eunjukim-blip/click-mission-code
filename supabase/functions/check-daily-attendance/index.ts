@@ -18,7 +18,7 @@ serve(async (req) => {
 
     const { userIdentifier } = await req.json();
 
-    if (!userIdentifier || !/^[A-Z0-9]{24}$/.test(userIdentifier)) {
+    if (!userIdentifier || !/^[0-9]{4}$/.test(userIdentifier)) {
       throw new Error("Invalid user identifier");
     }
 
