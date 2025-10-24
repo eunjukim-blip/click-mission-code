@@ -78,6 +78,17 @@ const Index = () => {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card
+          className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-yellow-500/20 to-orange-500/20 border-yellow-500/30"
+          onClick={() => navigate("/rewards")}
+        >
+          <CardHeader className="text-center pb-6 pt-8">
+            <div className="text-5xl mb-4">🎁</div>
+            <CardTitle className="text-xl">리워드 센터</CardTitle>
+            <p className="text-sm text-muted-foreground mt-2">레벨, 출석, 미션</p>
+          </CardHeader>
+        </Card>
+
+        <Card
           className="cursor-pointer hover:scale-105 transition-all duration-300 hover:shadow-lg bg-gradient-to-br from-primary/10 to-primary/5"
           onClick={() => navigate("/missions")}
         >

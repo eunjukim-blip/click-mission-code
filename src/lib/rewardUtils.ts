@@ -38,7 +38,7 @@ export const processGameReward = async (
 
     if (data.leveledUp) {
       toast.success(
-        `🎉 레벨업! Level ${data.newLevel}\n${pointsEarned}P + ${data.expEarned} EXP 획득!`,
+        `🎉 레벨업! Level ${data.newLevel}\n${pointsEarned}P + ${data.expEarned} EXP 획득! (Lv${data.newLevel} 보너스 적용)`,
         { duration: 5000 }
       );
     } else {

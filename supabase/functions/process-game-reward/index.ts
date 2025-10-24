@@ -39,9 +39,6 @@ serve(async (req) => {
 
     console.log(`Processing reward for user ${user.id}, game: ${gameType}, points: ${pointsEarned}`);
 
-    // 경험치 계산 (포인트의 1.5배)
-    const expEarned = Math.floor(pointsEarned * 1.5);
-
     // 1. user_stats 가져오기 또는 생성
     let { data: userStats, error: statsError } = await supabase
       .from("user_stats")
@@ -69,7 +66,13 @@ serve(async (req) => {
       throw statsError;
     }
 
-    // 2. 레벨 및 경험치 업데이트
+    // 2. 레벨별 경험치 계산 (레벨이 높을수록 더 많은 경험치)
+    const currentLevel = userStats?.level || 1;
+    const baseExp = Math.floor(pointsEarned * 1.5);
+    const levelBonus = 1 + (currentLevel - 1) * 0.1; // 레벨당 10% 보너스
+    const expEarned = Math.floor(baseExp * levelBonus);
+
+    // 3. 레벨 및 경험치 업데이트
     const newExperience = (userStats?.experience || 0) + expEarned;
     const newLevel = Math.floor(Math.sqrt(newExperience / 100)) + 1;
     const leveledUp = newLevel > (userStats?.level || 1);
@@ -83,7 +86,7 @@ serve(async (req) => {
       })
       .eq("user_id", user.id);
 
-    // 3. 포인트 적립 (profiles 테이블)
+    // 4. 포인트 적립 (profiles 테이블)
     const { data: profile } = await supabase
       .from("profiles")
       .select("total_points")
@@ -97,7 +100,7 @@ serve(async (req) => {
       .update({ total_points: newPoints })
       .eq("id", user.id);
 
-    // 4. 게임 활동 로그 기록
+    // 5. 게임 활동 로그 기록
     await supabase
       .from("game_activity_log")
       .insert({
@@ -108,7 +111,7 @@ serve(async (req) => {
         result: result,
       });
 
-    // 5. 주간 랭킹 업데이트
+    // 6. 주간 랭킹 업데이트
     const today = new Date();
     const weekStart = new Date(today);
     weekStart.setDate(today.getDate() - today.getDay()); // 이번 주 일요일
@@ -140,10 +143,10 @@ serve(async (req) => {
         });
     }
 
-    // 6. 미션 진행도 업데이트
+    // 7. 미션 진행도 업데이트
     await updateMissionProgress(supabase, user.id, gameType);
 
-    console.log(`Reward processed: ${pointsEarned}P, ${expEarned} EXP, Level: ${newLevel}`);
+    console.log(`Reward processed: ${pointsEarned}P, ${expEarned} EXP (Lv${currentLevel} bonus), Level: ${newLevel}`);
 
     return new Response(
       JSON.stringify({
