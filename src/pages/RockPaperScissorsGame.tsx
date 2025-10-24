@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { RewardedVideoAd } from "@/components/ads/RewardedVideoAd";
 import confetti from "canvas-confetti";
+import { processGameReward } from "@/lib/rewardUtils";
 
 type GameStage = "intro" | "playing" | "result";
 type Choice = "rock" | "paper" | "scissors";
@@ -147,6 +148,11 @@ export default function RockPaperScissorsGame() {
       });
 
       if (error) throw error;
+      
+      // 승리 시 리워드 처리
+      if (result === "win") {
+        await processGameReward("rps", { rounds: roundsPlayed, wins: roundsWon }, 20);
+      }
     } catch (error) {
       console.error("Error saving result:", error);
     }

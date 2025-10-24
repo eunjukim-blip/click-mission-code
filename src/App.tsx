@@ -13,6 +13,7 @@ const Auth = lazy(() => import("./pages/Auth"));
 const MissionCenter = lazy(() => import("./pages/MissionCenter"));
 const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
+const RewardsHub = lazy(() => import("./pages/RewardsHub"));
 const ReactionGame = lazy(() => import("./pages/ReactionGame"));
 const GemGame = lazy(() => import("./pages/GemGame"));
 const FortuneGame = lazy(() => import("./pages/FortuneGame"));
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/missions" element={<MissionCenter />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/rewards" element={<RewardsHub />} />
             <Route path="/reaction" element={<ReactionGame />} />
             <Route path="/gem" element={<GemGame />} />
             <Route path="/fortune" element={<FortuneGame />} />

@@ -6,6 +6,7 @@ import { RewardedVideoAd } from "@/components/ads/RewardedVideoAd";
 import { toast } from "@/hooks/use-toast";
 import { ArrowLeft, Gift } from "lucide-react";
 import confetti from "canvas-confetti";
+import { processGameReward } from "@/lib/rewardUtils";
 
 interface LadderOption {
   id: number;
@@ -168,6 +169,9 @@ export default function LadderGame() {
         if (reward === 300) {
           triggerConfetti();
         }
+        
+        // 리워드 처리
+        processGameReward("ladder", { reward, position: finalPosition }, reward);
         
         toast({
           title: "축하합니다! 🎉",
